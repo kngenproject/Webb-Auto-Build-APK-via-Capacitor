@@ -1,19 +1,207 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-  <title>App Saya</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APK Builder Pro</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: #e2e8f0;
+}
+
+/* Container */
+.container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+}
+
+/* Card */
+.card {
+  background: rgba(30, 41, 59, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* Title */
+h1 {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 20px;
+}
+
+/* Input */
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #020617;
+  color: white;
+}
+
+/* Buttons */
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 10px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.upload {
+  background: #22c55e;
+  color: black;
+}
+
+.upload:hover {
+  background: #16a34a;
+}
+
+.download {
+  background: #3b82f6;
+}
+
+.download:hover {
+  background: #2563eb;
+}
+
+/* Status */
+.status {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #020617;
+  font-size: 13px;
+}
+
+/* Loader */
+.loader {
+  display: none;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.loader div {
+  width: 10px;
+  height: 10px;
+  margin: 3px;
+  background: #22c55e;
+  border-radius: 50%;
+  display: inline-block;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+
+.loader div:nth-child(2) { animation-delay: 0.2s; }
+.loader div:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 20px;
+}
+</style>
 </head>
-<body style="text-align:center;font-family:sans-serif;">
-  <h1>🚀 APK Builder Test</h1>
-  <p>Ini contoh app dari HTML</p>
 
-  <button onclick="klik()">Klik Saya</button>
+<body>
 
-  <script>
-    function klik() {
-      alert("Berhasil jalan di APK!");
-    }
-  </script>
+<div class="container">
+  <div class="card">
+
+    <h1>🚀 APK Builder</h1>
+    <div class="subtitle">Upload project → Build → Download APK</div>
+
+    <input type="file" id="zipFile" accept=".zip">
+    <input type="text" id="repo" placeholder="username/repo">
+
+    <button class="upload" onclick="upload()">Upload & Build</button>
+    <button class="download" onclick="getApk()">Download APK</button>
+
+    <div class="loader" id="loader">
+      <div></div><div></div><div></div>
+    </div>
+
+    <div class="status" id="status">Status: idle</div>
+
+  </div>
+
+  <div class="footer">
+    APK Builder Pro • Auto GitHub Actions ⚡
+  </div>
+</div>
+
+<script>
+async function upload() {
+  const file = document.getElementById('zipFile').files[0];
+  const repo = document.getElementById('repo').value;
+
+  if (!file || !repo) {
+    alert("Isi semua field dulu!");
+    return;
+  }
+
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("status").textContent = "⏳ Uploading...";
+
+  const formData = new FormData();
+  formData.append("zip", file);
+  formData.append("repo", repo);
+
+  try {
+    const res = await fetch("http://localhost:3000/upload", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    document.getElementById("status").textContent = data.message;
+
+  } catch (e) {
+    document.getElementById("status").textContent = "❌ Error koneksi server";
+  }
+
+  document.getElementById("loader").style.display = "none";
+}
+
+function getApk() {
+  const repo = document.getElementById("repo").value;
+
+  if (!repo) {
+    alert("Isi repo dulu!");
+    return;
+  }
+
+  window.open(`http://localhost:3000/latest-apk?repo=${repo}`, "_blank");
+}
+</script>
+
 </body>
 </html>
