@@ -78,18 +78,20 @@ jobs:
         chmod +x gradlew
         ./gradlew assembleDebug
 
-    - name: Upload ke transfer.sh
+    - name: Upload ke file.io
       id: transfer
       run: |
         APK_PATH=$(find android/app/build/outputs/apk/debug/ -name "*.apk" | head -1)
         APK_NAME="${{ env.APP_NAME }}-${{ github.run_id }}.apk"
-        echo "📤 Mengupload APK ke transfer.sh..."
-        DOWNLOAD_URL=$(curl -s --upload-file "$APK_PATH" "https://transfer.sh/${APK_NAME}")
+        echo "📤 Mengupload APK ke file.io..."
+        RESPONSE=$(curl -s -F "file=@${APK_PATH};filename=${APK_NAME}" "https://file.io/?expires=14d")
+        echo "Response: $RESPONSE"
+        DOWNLOAD_URL=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('link',''))")
         echo "download_url=${DOWNLOAD_URL}" >> $GITHUB_OUTPUT
         echo "=========================================="
         echo "✅ APK SIAP DIDOWNLOAD!"
         echo "🔗 Link: ${DOWNLOAD_URL}"
-        echo "⏳ Link berlaku 14 hari"
+        echo "⏳ Link berlaku 14 hari (1x download)"
         echo "=========================================="
 
     - name: Simpan link ke apk-result.json
