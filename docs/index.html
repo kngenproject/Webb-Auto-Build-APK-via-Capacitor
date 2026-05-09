@@ -30,9 +30,9 @@
   --blue:      #059669;
   --red:       #dc2626;
   --amber:     #d97706;
-  --t1:        #14532d;
-  --t2:        #166534;
-  --t3:        #4ade80;
+  --t1:        #0f172a;
+  --t2:        #1e293b;
+  --t3:        #475569;
   --mono:      'IBM Plex Mono', monospace;
   --sans:      'Outfit', sans-serif;
   --display:   'Syne', sans-serif;
@@ -184,7 +184,7 @@ body::after {
 .section-title {
   font-family: var(--mono);
   font-size: 10px; font-weight: 500;
-  color: #4ade80;
+  color: #64748b;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   flex: 1;
@@ -205,7 +205,7 @@ body::after {
 .field { display:flex; flex-direction:column; gap:5px; }
 
 .flabel {
-  font-size:10px; font-weight:600; color:#166534;
+  font-size:10px; font-weight:600; color:#1e293b;
   letter-spacing:0.3px;
   display:flex; align-items:center; justify-content:space-between;
 }
@@ -232,13 +232,13 @@ input[type="text"], input[type="password"] {
   border-radius: var(--r);
   border:1.5px solid var(--border);
   background: var(--inp);
-  color: #14532d;
+  color: #0f172a;
   font-family: var(--mono); font-size:11px;
   outline:none; transition:all 0.18s;
   -webkit-appearance:none;
   caret-color: #16a34a;
 }
-input::placeholder { color:#86efac; font-size:10px; }
+input::placeholder { color:#94a3b8; font-size:10px; }
 input:focus {
   border-color: rgba(22,163,74,0.45);
   background: #fff;
@@ -276,7 +276,7 @@ button:active { transform:scale(0.96); }
 .btn-clear {
   flex:1; padding:11px 0; font-size:13px;
   background: #f0fdf4;
-  color: #166534;
+  color: #334155;
   border-radius:30px;
   border:1.5px solid rgba(22,163,74,0.2);
 }
@@ -303,11 +303,11 @@ button:active { transform:scale(0.96); }
 .file-icon { font-size:20px; flex-shrink:0; }
 .file-info { flex:1; overflow:hidden; }
 .file-info-title {
-  font-size:12px; font-weight:600; color:#14532d;
+  font-size:12px; font-weight:600; color:#0f172a;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .file-info-sub {
-  font-family:var(--mono); font-size:9px; color:#4ade80;
+  font-family:var(--mono); font-size:9px; color:#64748b;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   margin-top:2px;
 }
@@ -352,7 +352,7 @@ button:active { transform:scale(0.96); }
   margin-top:5px;
 }
 .progress-label {
-  font-family:var(--mono); font-size:8px; color:#4ade80;
+  font-family:var(--mono); font-size:8px; color:#64748b;
   letter-spacing:0.5px;
 }
 
@@ -378,7 +378,7 @@ button:active { transform:scale(0.96); }
   background: #f0fdf4;
   border:1px solid rgba(22,163,74,0.2);
   font-family:var(--mono); font-size:10px;
-  color:#166534; word-break:break-word;
+  color:#334155; word-break:break-word;
   line-height:1.6; transition:all 0.25s;
 }
 .status-box.error   {
@@ -426,7 +426,7 @@ button:active { transform:scale(0.96); }
 /* ── FOOTER ──────────────────────────────────── */
 .footer {
   flex-shrink:0; text-align:center;
-  font-family:var(--mono); font-size:8px; color:#4ade80;
+  font-family:var(--mono); font-size:8px; color:#94a3b8;
   padding:6px 0 max(8px, env(safe-area-inset-bottom, 0px));
   background: #fff;
   border-top:1px solid rgba(22,163,74,0.12);
