@@ -12,14 +12,16 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
-    - name: Download project ZIP dari GitHub Release
+    - name: Download project ZIP
       run: |
         ZIP_URL="${{ github.event.client_payload.zip_url }}"
         APP_NAME="${{ github.event.client_payload.app_name }}"
         echo "ZIP_URL=${ZIP_URL}" >> $GITHUB_ENV
         echo "APP_NAME=${APP_NAME}" >> $GITHUB_ENV
         echo "Downloading ZIP dari: $ZIP_URL"
-        curl -L "$ZIP_URL" -o project.zip
+        curl -L \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          "${ZIP_URL}" -o project.zip
         unzip -o project.zip -d ./project
         rsync -av ./project/ ./ --remove-source-files
         rm -rf project project.zip
@@ -46,6 +48,7 @@ jobs:
       run: |
         npm ci || npm install
         npm install -g @capacitor/cli
+        npm install @capacitor/android
 
     - name: Build web app
       run: |
@@ -64,8 +67,10 @@ jobs:
         echo "✅ capacitor.config.json ditemukan:"
         cat capacitor.config.json
 
-    - name: Sync Capacitor Android
-      run: npx cap sync android
+    - name: Add & Sync Capacitor Android
+      run: |
+        npx cap add android
+        npx cap sync android
 
     - name: Build APK
       run: |
@@ -80,3 +85,4 @@ jobs:
         path: android/app/build/outputs/apk/debug/*.apk
         if-no-files-found: error
         retention-days: 7
+        
