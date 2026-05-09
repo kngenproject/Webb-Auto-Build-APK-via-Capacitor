@@ -1,4 +1,4 @@
-name: Build APK from uploaded ZIP
+name: Build APK
 
 on:
   repository_dispatch:
@@ -7,122 +7,90 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Download project ZIP
-      run: |
-        ZIP_URL="${{ github.event.client_payload.zip_url }}"
-        APP_NAME="${{ github.event.client_payload.app_name }}"
-        echo "ZIP_URL=${ZIP_URL}" >> $GITHUB_ENV
-        echo "APP_NAME=${APP_NAME}" >> $GITHUB_ENV
-        echo "Downloading ZIP dari: $ZIP_URL"
-        curl -L \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          "${ZIP_URL}" -o project.zip
-        unzip -o project.zip -d ./project
-        rsync -av ./project/ ./ --remove-source-files
-        rm -rf project project.zip
-        echo "✅ Project berhasil diekstrak"
-        ls -la
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Download & extract ZIP project
+        run: |
+          curl -L "${{ github.event.client_payload.zip_url }}" -o project.zip
+          unzip -o project.zip -d project/
+          cd project && npm install && npm run build
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-      with:
-        cmdline-tools-version: 11076708
+      - name: Install Capacitor & add Android
+        run: |
+          cd project
+          npx cap add android
+          npx cap sync android
 
-    - name: Install dependencies
-      run: |
-        npm ci || npm install
-        npm install -g @capacitor/cli
-        npm install @capacitor/android
+      - name: Ganti ikon kustom (jika ada res/icon.png)
+        run: |
+          if [ -f "project/res/icon.png" ]; then
+            echo "✅ Ikon kustom ditemukan, mengganti..."
+            sudo apt-get install -y imagemagick -q
 
-    - name: Build web app
-      run: |
-        if npm run | grep -q " build"; then
-          npm run build
-        else
-          echo "Tidak ada script build, skip"
-        fi
+            RES=project/android/app/src/main/res
+            SRC=project/res/icon.png
 
-    - name: Cek capacitor.config.json
-      run: |
-        if [ ! -f capacitor.config.json ]; then
-          echo "❌ capacitor.config.json tidak ditemukan!"
-          exit 1
-        fi
-        echo "✅ capacitor.config.json ditemukan:"
-        cat capacitor.config.json
+            mkdir -p $RES/mipmap-mdpi $RES/mipmap-hdpi $RES/mipmap-xhdpi \
+                     $RES/mipmap-xxhdpi $RES/mipmap-xxxhdpi
 
-    - name: Add & Sync Capacitor Android
-      run: |
-        npx cap add android
-        npx cap sync android
+            convert "$SRC" -resize 48x48   $RES/mipmap-mdpi/ic_launcher.png
+            convert "$SRC" -resize 72x72   $RES/mipmap-hdpi/ic_launcher.png
+            convert "$SRC" -resize 96x96   $RES/mipmap-xhdpi/ic_launcher.png
+            convert "$SRC" -resize 144x144 $RES/mipmap-xxhdpi/ic_launcher.png
+            convert "$SRC" -resize 192x192 $RES/mipmap-xxxhdpi/ic_launcher.png
 
-    - name: Build APK
-      run: |
-        cd android
-        chmod +x gradlew
-        ./gradlew assembleDebug
+            for DPI in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+              cp $RES/mipmap-$DPI/ic_launcher.png $RES/mipmap-$DPI/ic_launcher_round.png
+              # Hapus .webp bawaan Capacitor agar tidak konflik
+              rm -f $RES/mipmap-$DPI/ic_launcher.webp $RES/mipmap-$DPI/ic_launcher_round.webp
+            done
 
-    - name: Upload ke GoFile
-      id: transfer
-      run: |
-        APK_PATH=$(find android/app/build/outputs/apk/debug/ -name "*.apk" | head -1)
-        APK_NAME="${{ env.APP_NAME }}-${{ github.run_id }}.apk"
-        echo "📤 Mengupload APK ke GoFile..."
+            echo "✅ Ikon berhasil diganti!"
+          else
+            echo "ℹ️ Tidak ada ikon kustom, pakai default Capacitor"
+          fi
 
-        # 1. Dapatkan server upload terbaik
-        SERVER=$(curl -s "https://api.gofile.io/servers" | grep -o '"name":"[^"]*"' | head -1 | sed 's/"name":"//;s/"//')
-        echo "Server: $SERVER"
+      - name: Build debug APK
+        run: |
+          cd project/android
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
-        # 2. Upload APK
-        RESPONSE=$(curl -s --max-time 180 -F "file=@${APK_PATH};filename=${APK_NAME}" "https://${SERVER}.gofile.io/contents/uploadfile")
-        echo "Response: $RESPONSE"
+      - name: Upload APK sebagai artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: project/android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
 
-        # 3. Ambil link download
-        DOWNLOAD_URL=$(echo "$RESPONSE" | grep -o '"downloadPage":"[^"]*"' | sed 's/"downloadPage":"//;s/"//')
-        if [ -z "$DOWNLOAD_URL" ]; then
-          echo "❌ Upload gagal"
-          exit 1
-        fi
+      - name: Simpan link APK ke apk-result.json
+        run: |
+          RUN_ID=${{ github.run_id }}
+          REPO=${{ github.repository }}
+          URL="https://github.com/${REPO}/actions/runs/${RUN_ID}"
 
-        echo "download_url=${DOWNLOAD_URL}" >> $GITHUB_OUTPUT
-        echo "=========================================="
-        echo "✅ APK SIAP DIDOWNLOAD!"
-        echo "🔗 Link: ${DOWNLOAD_URL}"
-        echo "⏳ Link tidak expired selama ada aktivitas"
-        echo "=========================================="
+          JSON="{\"run_id\":\"${RUN_ID}\",\"url\":\"${URL}\"}"
+          ENCODED=$(echo -n "$JSON" | base64 -w 0)
 
-    - name: Simpan link ke apk-result.json
-      run: |
-        DOWNLOAD_URL="${{ steps.transfer.outputs.download_url }}"
-        RUN_ID="${{ github.run_id }}"
-        APP_NAME="${{ env.APP_NAME }}"
-        echo "{\"url\":\"${DOWNLOAD_URL}\",\"run_id\":\"${RUN_ID}\",\"app\":\"${APP_NAME}\",\"ts\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > apk-result.json
-        git config user.name "github-actions"
-        git config user.email "actions@github.com"
-        git add apk-result.json
-        git commit -m "APK result: ${APP_NAME} run ${RUN_ID}"
-        git push
+          SHA=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${REPO}/contents/apk-result.json" | jq -r '.sha // empty')
 
-    - name: Upload APK artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: apk-${{ env.APP_NAME }}-${{ github.run_id }}
-        path: android/app/build/outputs/apk/debug/*.apk
-        if-no-files-found: error
-        retention-days: 7
+          PAYLOAD="{\"message\":\"Update apk-result.json\",\"content\":\"${ENCODED}\""
+          if [ -n "$SHA" ]; then PAYLOAD="${PAYLOAD},\"sha\":\"${SHA}\""; fi
+          PAYLOAD="${PAYLOAD}}"
+
+          curl -s -X PUT \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/${REPO}/contents/apk-result.json" \
+            -d "$PAYLOAD"
