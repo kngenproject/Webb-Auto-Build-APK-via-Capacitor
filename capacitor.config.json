@@ -1,14 +1,8 @@
 {
-  "name": "apk-builder",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "echo build selesai"
-  },
-  "dependencies": {
-    "@capacitor/core": "^5.0.0"
-  },
-  "devDependencies": {
-    "@capacitor/cli": "^5.0.0",
-    "@capacitor/android": "^5.0.0"
+  "appId": "com.example.apkbuilder",
+  "appName": "APK Builder",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
   }
 }
