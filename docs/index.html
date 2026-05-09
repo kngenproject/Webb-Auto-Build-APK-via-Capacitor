@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <title>APK Builder Pro</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#080d1a">
+<meta name="theme-color" content="#eef2ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="APK Builder">
 <link rel="apple-touch-icon" href="icon/icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon/icon-192.png">
@@ -16,28 +16,33 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /*
-  Target: Infinix Note 30
-  Screen : 1080 × 2460 px · 6.78" · ~396ppi
-  Viewport: ~393 × 829 dp (Chrome Android, status bar ~24dp, nav bar ~48dp)
-  Available height CSS: ~829dp minus browser chrome ≈ 757–780dp usable
+  Target : Infinix Note 30 · 1080×2460px · ~393×829 dp viewport
+  Theme  : Light
 */
-
 :root {
-  --bg:      #080d1a;
-  --card:    #0d1525;
-  --inp:     #060b17;
-  --ele:     #111d35;
-  --border:  rgba(255,255,255,0.07);
-  --bact:    rgba(56,189,248,0.45);
-  --accent:  #38bdf8;
-  --accent2: #818cf8;
-  --green:   #34d399;
-  --red:     #f87171;
-  --t1:      #f0f6ff;
-  --t2:      #8b99b5;
-  --t3:      #3d4f6e;
-  --mono:    'Space Mono', monospace;
-  --sans:    'DM Sans', system-ui, sans-serif;
+  --bg:       #eef2ff;
+  --bg2:      #e4e9fb;
+  --card:     #ffffff;
+  --inp:      #f3f6ff;
+  --border:   #dde3f5;
+  --bact:     #6366f1;
+  --accent:   #6366f1;
+  --accent-l: #eef2ff;
+  --green:    #16a34a;
+  --green-l:  #dcfce7;
+  --red:      #dc2626;
+  --red-l:    #fee2e2;
+  --blue:     #2563eb;
+  --blue-l:   #dbeafe;
+  --amber:    #d97706;
+  --t1:       #0f172a;
+  --t2:       #475569;
+  --t3:       #94a3b8;
+  --shadow:   0 2px 12px rgba(99,102,241,0.10);
+  --shadow-g: 0 4px 18px rgba(22,163,74,0.18);
+  --shadow-b: 0 4px 18px rgba(37,99,235,0.16);
+  --mono:     'Space Mono', monospace;
+  --sans:     'DM Sans', system-ui, sans-serif;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -48,220 +53,210 @@ body {
   font-family: var(--sans);
   background: var(--bg);
   color: var(--t1);
-  /* fill exact viewport, no scroll */
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  background-image: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(56,189,248,0.07) 0%, transparent 55%);
 }
 
-/* ── TOPBAR ── ~52dp ─────────────────────────── */
+/* ── TOPBAR ──────────────────────────────────── */
 .topbar {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px 6px;
-  /* Infinix Note 30 statusbar ~28dp */
+  padding: 10px 16px 8px;
   padding-top: max(10px, env(safe-area-inset-top, 28px));
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 8px rgba(99,102,241,0.07);
 }
 
-.logo { display:flex; align-items:center; gap:8px; }
+.logo { display:flex; align-items:center; gap:9px; }
 
 .logo-img {
-  width: 30px; height: 30px;
-  border-radius: 8px; object-fit: cover;
-  box-shadow: 0 0 12px rgba(56,189,248,0.3);
+  width: 32px; height: 32px;
+  border-radius: 9px; object-fit: cover;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.2);
 }
 .logo-fallback {
-  width:30px; height:30px; border-radius:8px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  width:32px; height:32px; border-radius:9px;
+  background: linear-gradient(135deg, #6366f1, #818cf8);
   display:none; align-items:center; justify-content:center;
-  font-size:15px;
+  font-size:16px; box-shadow: 0 2px 8px rgba(99,102,241,0.3);
 }
-.logo-text { font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:-0.2px; }
+.logo-text { font-family:var(--mono); font-size:13px; font-weight:700; color:var(--t1); letter-spacing:-0.3px; }
 .logo-text b { color:var(--accent); }
 
 .pwa-chip {
   font-family:var(--mono); font-size:8px; font-weight:700;
-  color:var(--accent); background:rgba(56,189,248,0.1);
-  border:1px solid rgba(56,189,248,0.2); border-radius:20px;
+  color:var(--accent); background:var(--accent-l);
+  border:1.5px solid #c7d2fe; border-radius:20px;
   padding:3px 10px; cursor:pointer; display:none; letter-spacing:0.3px;
 }
 .pwa-chip.show { display:block; }
 
-/* ── MAIN AREA ── flex fills remaining height ─── */
+/* ── MAIN ────────────────────────────────────── */
 .main {
   flex: 1;
-  min-height: 0;          /* allow flex child to shrink */
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  padding: 2px 14px 6px;
-  padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
+  gap: 8px;
+  padding: 10px 14px 8px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
   overflow: hidden;
 }
 
-/* ── CARD ─────────────────────────────────────── */
+/* ── CARD ────────────────────────────────────── */
 .card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 10px 13px;
+  border-radius: 16px;
+  padding: 11px 13px;
   flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
+  box-shadow: var(--shadow);
 }
-.card::before {
-  content:''; position:absolute; inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,0.025) 0%,transparent 60%);
-  pointer-events:none;
-}
-
-/* build card takes remaining space */
-.card-build { flex: 1; min-height: 0; }
+.card-build { flex:1; min-height:0; display:flex; flex-direction:column; }
 
 .card-title {
   font-family:var(--mono); font-size:7.5px; font-weight:700;
-  letter-spacing:1.3px; color:var(--t3); text-transform:uppercase;
-  margin-bottom:8px; display:flex; align-items:center; gap:6px;
+  letter-spacing:1.4px; color:var(--t3); text-transform:uppercase;
+  margin-bottom:9px; display:flex; align-items:center; gap:7px;
 }
 .card-title::after { content:''; flex:1; height:1px; background:var(--border); }
 
-/* ── 2 COL ────────────────────────────────────── */
+/* ── 2 COL ───────────────────────────────────── */
 .two-col { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
 
-/* ── FIELD ────────────────────────────────────── */
+/* ── FIELD ───────────────────────────────────── */
 .field { display:flex; flex-direction:column; gap:4px; }
 
 .flabel {
-  font-size:9.5px; font-weight:600; color:var(--t2);
+  font-size:10px; font-weight:600; color:var(--t2);
   display:flex; align-items:center; justify-content:space-between;
 }
 
 .token-toggle {
   font-family:var(--mono); font-size:7.5px; font-weight:700;
-  color:var(--accent); background:rgba(56,189,248,0.1);
-  border:1px solid rgba(56,189,248,0.2); padding:2px 8px;
+  color:var(--accent); background:var(--accent-l);
+  border:1px solid #c7d2fe; padding:2px 8px;
   border-radius:20px; cursor:pointer; white-space:nowrap;
 }
 .save-badge {
   font-family:var(--mono); font-size:7.5px; font-weight:700;
-  color:var(--green); background:rgba(52,211,153,0.1);
-  border:1px solid rgba(52,211,153,0.2); padding:2px 8px;
+  color:var(--green); background:var(--green-l);
+  border:1px solid #bbf7d0; padding:2px 8px;
   border-radius:20px; display:none; white-space:nowrap;
 }
 
 input[type="text"], input[type="password"] {
   width:100%; padding:8px 10px; border-radius:10px;
-  border:1px solid var(--border); background:var(--inp);
+  border:1.5px solid var(--border); background:var(--inp);
   color:var(--t1); font-family:var(--mono); font-size:11px;
   outline:none; transition:all 0.18s; -webkit-appearance:none;
 }
 input::placeholder { color:var(--t3); font-size:10px; }
-input:focus { border-color:var(--bact); box-shadow:0 0 0 2px rgba(56,189,248,0.1); }
+input:focus { border-color:var(--bact); background:#fff; box-shadow:0 0 0 3px rgba(99,102,241,0.12); }
 
-/* ── SAVE ROW ─────────────────────────────────── */
+/* ── SAVE ROW ────────────────────────────────── */
 .save-row { display:flex; gap:8px; margin-top:9px; }
 
-/* ── BUTTONS ──────────────────────────────────── */
-button {
-  border:none; cursor:pointer;
-  font-family:var(--sans); font-weight:600;
-  transition:all 0.18s; -webkit-appearance:none;
-}
+/* ── BUTTONS ─────────────────────────────────── */
+button { border:none; cursor:pointer; font-family:var(--sans); font-weight:600; transition:all 0.18s; -webkit-appearance:none; }
 button:active { transform:scale(0.96); }
 
 .btn-save {
-  flex:1; padding:8px 0; font-size:12px;
-  background:var(--accent); color:#071525; border-radius:30px;
+  flex:1; padding:9px 0; font-size:12px;
+  background:var(--accent); color:#fff; border-radius:30px;
+  box-shadow:0 2px 10px rgba(99,102,241,0.25);
 }
-.btn-save.saved { background:var(--green); color:#062012; }
+.btn-save.saved { background:var(--green); box-shadow:0 2px 10px rgba(22,163,74,0.25); }
 
 .btn-clear {
-  flex:1; padding:8px 0; font-size:12px;
-  background:var(--ele); color:var(--t2);
-  border-radius:30px; border:1px solid var(--border);
+  flex:1; padding:9px 0; font-size:12px;
+  background:var(--inp); color:var(--t2);
+  border-radius:30px; border:1.5px solid var(--border);
 }
 
-/* ── FILE PICK ────────────────────────────────── */
+/* ── FILE PICK ───────────────────────────────── */
 .file-pick {
-  display:flex; align-items:center; gap:9px; padding:8px 11px;
-  border-radius:10px; border:1.5px dashed var(--border);
+  display:flex; align-items:center; gap:9px; padding:9px 11px;
+  border-radius:11px; border:1.5px dashed var(--border);
   background:var(--inp); cursor:pointer; position:relative; transition:all 0.18s;
 }
-.file-pick.has-file { border-color:rgba(52,211,153,0.35); background:rgba(52,211,153,0.04); }
+.file-pick.has-file { border-color:#86efac; background:var(--green-l); }
 .file-pick input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-.file-icon { font-size:17px; flex-shrink:0; }
+.file-icon { font-size:18px; flex-shrink:0; }
 .file-info { flex:1; overflow:hidden; }
 .file-info-title { font-size:11px; font-weight:600; color:var(--t2); }
 .file-info-sub { font-family:var(--mono); font-size:9px; color:var(--t3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .file-info-sub.ok { color:var(--green); }
 
-/* ── BUILD BTN ────────────────────────────────── */
+/* ── BUILD BTN ───────────────────────────────── */
 .btn-build {
-  width:100%; padding:12px; font-size:14px; font-weight:700;
+  width:100%; padding:13px; font-size:14px; font-weight:700;
   background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff;
-  border-radius:11px; box-shadow:0 3px 16px rgba(34,197,94,0.22);
+  border-radius:12px; box-shadow:var(--shadow-g); letter-spacing:0.1px;
 }
 .btn-build:disabled {
-  background:#0c2014; color:#1e4a28;
+  background:#d1fae5; color:#6ee7b7;
   box-shadow:none; transform:none; cursor:not-allowed;
 }
 
-/* ── PROGRESS ─────────────────────────────────── */
-.progress-wrap { display:none; margin-top:7px; }
-.progress-track { height:3px; background:var(--ele); border-radius:3px; overflow:hidden; }
+/* ── PROGRESS ────────────────────────────────── */
+.progress-wrap { display:none; margin-top:8px; }
+.progress-track { height:4px; background:var(--bg2); border-radius:4px; overflow:hidden; }
 .progress-fill {
-  height:100%; background:linear-gradient(90deg,var(--green),var(--accent));
-  border-radius:3px; width:0%; transition:width 0.4s ease;
+  height:100%; background:linear-gradient(90deg,#22c55e,#6366f1);
+  border-radius:4px; width:0%; transition:width 0.4s ease;
 }
 .progress-row { display:flex; justify-content:space-between; margin-top:3px; }
 .progress-label { font-family:var(--mono); font-size:8.5px; color:var(--t3); }
 
-/* ── LOADER ───────────────────────────────────── */
-.loader { display:none; gap:4px; justify-content:center; margin:5px 0 2px; }
+/* ── LOADER ──────────────────────────────────── */
+.loader { display:none; gap:4px; justify-content:center; margin:6px 0 2px; }
 .loader.on { display:flex; }
-.dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:pulse 1.4s ease-in-out infinite; }
-.dot:nth-child(2) { animation-delay:.2s; background:var(--accent2); }
-.dot:nth-child(3) { animation-delay:.4s; background:var(--green); }
+.dot { width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse 1.4s ease-in-out infinite; }
+.dot:nth-child(2) { animation-delay:.2s; background:#22c55e; }
+.dot:nth-child(3) { animation-delay:.4s; background:var(--blue); }
 @keyframes pulse { 0%,80%,100%{transform:scale(0.4);opacity:0.3;} 40%{transform:scale(1);opacity:1;} }
 
-/* ── STATUS ───────────────────────────────────── */
+/* ── STATUS ──────────────────────────────────── */
 .status-box {
-  padding:7px 10px; border-radius:10px; background:var(--ele);
-  border:1px solid var(--border); font-family:var(--mono);
+  padding:9px 11px; border-radius:11px; background:var(--inp);
+  border:1.5px solid var(--border); font-family:var(--mono);
   font-size:10px; color:var(--t2); word-break:break-word;
-  line-height:1.5; margin-top:7px; transition:all 0.2s;
+  line-height:1.55; margin-top:8px; transition:all 0.2s; flex-shrink:0;
 }
-.status-box.error   { color:var(--red);   background:rgba(248,113,113,0.06); border-color:rgba(248,113,113,0.18); }
-.status-box.success { color:var(--green); background:rgba(52,211,153,0.06);  border-color:rgba(52,211,153,0.18); }
-.status-box.info    { color:var(--accent);background:rgba(56,189,248,0.06);  border-color:rgba(56,189,248,0.18); }
+.status-box.error   { color:var(--red);   background:var(--red-l);   border-color:#fca5a5; }
+.status-box.success { color:var(--green); background:var(--green-l); border-color:#86efac; }
+.status-box.info    { color:var(--blue);  background:var(--blue-l);  border-color:#93c5fd; }
 
-/* ── DOWNLOAD ─────────────────────────────────── */
+/* ── DOWNLOAD ────────────────────────────────── */
 .btn-download {
-  width:100%; padding:11px; font-size:13px; font-weight:700;
+  width:100%; padding:12px; font-size:13px; font-weight:700;
   background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff;
-  border-radius:11px; box-shadow:0 3px 14px rgba(59,130,246,0.2); margin-top:7px;
+  border-radius:12px; box-shadow:var(--shadow-b); margin-top:8px; flex-shrink:0;
 }
 .btn-download:disabled {
-  background:#091a38; color:#1a3060;
+  background:#dbeafe; color:#93c5fd;
   box-shadow:none; transform:none; cursor:not-allowed;
 }
 
 .btn-install {
   width:100%; padding:9px; font-size:12px;
-  background:var(--ele); color:var(--accent2);
-  border:1px solid rgba(129,140,248,0.25);
-  border-radius:11px; margin-top:6px; display:none;
+  background:var(--accent-l); color:var(--accent);
+  border:1.5px solid #c7d2fe; border-radius:12px;
+  margin-top:7px; display:none; flex-shrink:0;
 }
 .btn-install.show { display:block; }
 
-/* ── FOOTER ── ~22dp ──────────────────────────── */
+/* ── FOOTER ──────────────────────────────────── */
 .footer {
   flex-shrink:0; text-align:center;
   font-family:var(--mono); font-size:8.5px; color:var(--t3);
-  padding:4px 0 max(4px, env(safe-area-inset-bottom, 0px));
+  padding:4px 0 max(6px, env(safe-area-inset-bottom, 0px));
+  background:var(--card); border-top:1px solid var(--border);
   letter-spacing:0.4px;
 }
 </style>
@@ -360,11 +355,10 @@ button:active { transform:scale(0.96); }
 let runId=null,artifactUrl=null,deferredPrompt=null;
 
 window.addEventListener('beforeinstallprompt',(e)=>{
-  e.preventDefault(); deferredPrompt=e;
+  e.preventDefault();deferredPrompt=e;
   document.getElementById('installBtn').classList.add('show');
   document.getElementById('installBtnBottom').classList.add('show');
 });
-
 function installPWA(){
   if(!deferredPrompt)return;
   deferredPrompt.prompt();
@@ -374,25 +368,22 @@ function installPWA(){
     document.getElementById('installBtnBottom').classList.remove('show');
   });
 }
-
 if('serviceWorker' in navigator)
   window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-
-window.addEventListener('load',()=>{ loadSettings(); setStatus('✅ Siap membangun APK'); });
+window.addEventListener('load',()=>{loadSettings();setStatus('✅ Siap membangun APK');});
 
 function onFileSelect(input){
-  const file=input.files[0]; if(!file)return;
+  const file=input.files[0];if(!file)return;
   document.getElementById('filePick').classList.add('has-file');
   document.getElementById('fileIcon').textContent='✅';
   const name=file.name;
   document.getElementById('fileTitle').textContent=name.length>24?name.substring(0,24)+'…':name;
   const sub=document.getElementById('fileSub');
-  sub.textContent=(file.size/1024/1024).toFixed(2)+' MB'; sub.classList.add('ok');
+  sub.textContent=(file.size/1024/1024).toFixed(2)+' MB';sub.classList.add('ok');
 }
-
 function setStatus(msg,type=''){
   const el=document.getElementById('status');
-  el.textContent=msg; el.className='status-box'+(type?' '+type:'');
+  el.textContent=msg;el.className='status-box'+(type?' '+type:'');
 }
 function setProgress(pct){
   const wrap=document.getElementById('progressBar');
@@ -417,13 +408,13 @@ function saveSettings(){
   if(repo)localStorage.setItem('apk_repo',repo);
   showSavedBadges();
   const btn=document.getElementById('btnSave');
-  btn.textContent='✅ Tersimpan!'; btn.classList.add('saved');
+  btn.textContent='✅ Tersimpan!';btn.classList.add('saved');
   setTimeout(()=>{btn.textContent='💾 Simpan';btn.classList.remove('saved');},1800);
   setStatus('✅ Pengaturan disimpan!','success');
 }
 function clearSettings(){
-  localStorage.removeItem('apk_token'); localStorage.removeItem('apk_repo');
-  document.getElementById('token').value=''; document.getElementById('workflowRepo').value='';
+  localStorage.removeItem('apk_token');localStorage.removeItem('apk_repo');
+  document.getElementById('token').value='';document.getElementById('workflowRepo').value='';
   document.getElementById('tokenSaved').style.display='none';
   document.getElementById('repoSaved').style.display='none';
   setStatus('🗑 Pengaturan dihapus.','info');
