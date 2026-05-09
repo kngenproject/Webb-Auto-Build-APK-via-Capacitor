@@ -485,17 +485,25 @@ async function waitForBuild(token, owner, repo, rid) {
   throw new Error('Timeout: Build tidak selesai dalam 10 menit');
 }
 
-// ── Ambil URL Download Artifact ────────────────────
+// ── Ambil URL Download dari apk-result.json ────────
 async function getArtifactUrl(token, owner, repo, rid) {
-  setStatus('📥 Mengambil link APK...', 'info');
+  setStatus('📥 Mengambil link APK dari transfer.sh...', 'info');
   setProgress(97);
-  const res = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/actions/runs/${rid}/artifacts`,
-    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
-  );
-  const data = await res.json();
-  if (!data.artifacts || data.artifacts.length === 0) throw new Error('Artifact tidak ditemukan');
-  return data.artifacts[0].archive_download_url;
+  // Polling apk-result.json sampai run_id cocok
+  for (let i = 0; i < 10; i++) {
+    await sleep(5000);
+    const res = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/apk-result.json`,
+      { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }, cache: 'no-store' }
+    );
+    if (!res.ok) continue;
+    const data = await res.json();
+    const content = JSON.parse(atob(data.content.replace(/\n/g, '')));
+    if (String(content.run_id) === String(rid) && content.url) {
+      return content.url;
+    }
+  }
+  throw new Error('Link download tidak ditemukan. Cek log GitHub Actions.');
 }
 
 // ── Main: Start Build ──────────────────────────────
@@ -545,12 +553,15 @@ async function startBuild() {
 // ── Download APK ───────────────────────────────────
 function downloadApk() {
   if (!artifactUrl) return setStatus('❌ Belum ada APK. Jalankan build dulu!', 'error');
-  // GitHub artifact archive_download_url melakukan redirect ke storage eksternal
-  // yang tidak support CORS — tidak bisa di-fetch langsung dari browser.
-  // Solusi: buka di tab baru, browser ikuti redirect dan download otomatis.
-  setStatus('⬇️ Membuka halaman download di tab baru...', 'info');
-  window.open(artifactUrl, '_blank');
-  setStatus('✅ Tab download dibuka! Login GitHub jika diminta, lalu klik download.', 'success');
+  // Link transfer.sh bisa didownload langsung tanpa login
+  const a = document.createElement('a');
+  a.href = artifactUrl;
+  a.download = '';
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setStatus('✅ Download dimulai! File APK akan tersimpan di HP kamu.', 'success');
 }
 
 // ── Helper ─────────────────────────────────────────

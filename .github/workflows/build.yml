@@ -78,6 +78,32 @@ jobs:
         chmod +x gradlew
         ./gradlew assembleDebug
 
+    - name: Upload ke transfer.sh
+      id: transfer
+      run: |
+        APK_PATH=$(find android/app/build/outputs/apk/debug/ -name "*.apk" | head -1)
+        APK_NAME="${{ env.APP_NAME }}-${{ github.run_id }}.apk"
+        echo "📤 Mengupload APK ke transfer.sh..."
+        DOWNLOAD_URL=$(curl -s --upload-file "$APK_PATH" "https://transfer.sh/${APK_NAME}")
+        echo "download_url=${DOWNLOAD_URL}" >> $GITHUB_OUTPUT
+        echo "=========================================="
+        echo "✅ APK SIAP DIDOWNLOAD!"
+        echo "🔗 Link: ${DOWNLOAD_URL}"
+        echo "⏳ Link berlaku 14 hari"
+        echo "=========================================="
+
+    - name: Simpan link ke apk-result.json
+      run: |
+        DOWNLOAD_URL="${{ steps.transfer.outputs.download_url }}"
+        RUN_ID="${{ github.run_id }}"
+        APP_NAME="${{ env.APP_NAME }}"
+        echo "{\"url\":\"${DOWNLOAD_URL}\",\"run_id\":\"${RUN_ID}\",\"app\":\"${APP_NAME}\",\"ts\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > apk-result.json
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add apk-result.json
+        git commit -m "APK result: ${APP_NAME} run ${RUN_ID}"
+        git push
+
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
@@ -85,4 +111,3 @@ jobs:
         path: android/app/build/outputs/apk/debug/*.apk
         if-no-files-found: error
         retention-days: 7
-        
