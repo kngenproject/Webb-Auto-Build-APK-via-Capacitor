@@ -15,6 +15,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/*
+  Target: Infinix Note 30
+  Screen : 1080 × 2460 px · 6.78" · ~396ppi
+  Viewport: ~393 × 829 dp (Chrome Android, status bar ~24dp, nav bar ~48dp)
+  Available height CSS: ~829dp minus browser chrome ≈ 757–780dp usable
+*/
+
 :root {
   --bg:      #080d1a;
   --card:    #0d1525;
@@ -31,193 +38,237 @@
   --t3:      #3d4f6e;
   --mono:    'Space Mono', monospace;
   --sans:    'DM Sans', system-ui, sans-serif;
-  --r:       16px;
-  --rm:      12px;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body { height:100%; overflow:hidden; }
+::-webkit-scrollbar { display:none; }
 
 body {
   font-family: var(--sans);
   background: var(--bg);
   color: var(--t1);
+  /* fill exact viewport, no scroll */
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  height: 100dvh;
-  background-image: radial-gradient(ellipse 80% 50% at 50% -5%, rgba(56,189,248,0.07) 0%, transparent 55%);
+  background-image: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(56,189,248,0.07) 0%, transparent 55%);
 }
 
-::-webkit-scrollbar { display:none; }
-
-/* TOPBAR */
+/* ── TOPBAR ── ~52dp ─────────────────────────── */
 .topbar {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px 8px;
-  padding-top: max(12px, env(safe-area-inset-top));
-  flex-shrink: 0;
+  padding: 10px 16px 6px;
+  /* Infinix Note 30 statusbar ~28dp */
+  padding-top: max(10px, env(safe-area-inset-top, 28px));
 }
-.logo { display:flex; align-items:center; gap:9px; }
+
+.logo { display:flex; align-items:center; gap:8px; }
+
 .logo-img {
-  width:32px; height:32px; border-radius:9px; object-fit:cover;
-  box-shadow:0 0 14px rgba(56,189,248,0.25);
+  width: 30px; height: 30px;
+  border-radius: 8px; object-fit: cover;
+  box-shadow: 0 0 12px rgba(56,189,248,0.3);
 }
 .logo-fallback {
-  width:32px; height:32px; border-radius:9px;
+  width:30px; height:30px; border-radius:8px;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
   display:none; align-items:center; justify-content:center;
-  font-size:17px; box-shadow:0 0 14px rgba(56,189,248,0.25);
+  font-size:15px;
 }
-.logo-text { font-family:var(--mono); font-size:14px; font-weight:700; letter-spacing:-0.3px; }
+.logo-text { font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:-0.2px; }
 .logo-text b { color:var(--accent); }
+
 .pwa-chip {
-  font-family:var(--mono); font-size:9px; font-weight:700;
+  font-family:var(--mono); font-size:8px; font-weight:700;
   color:var(--accent); background:rgba(56,189,248,0.1);
   border:1px solid rgba(56,189,248,0.2); border-radius:20px;
-  padding:4px 11px; cursor:pointer; display:none; letter-spacing:0.4px;
+  padding:3px 10px; cursor:pointer; display:none; letter-spacing:0.3px;
 }
 .pwa-chip.show { display:block; }
 
-/* MAIN */
+/* ── MAIN AREA ── flex fills remaining height ─── */
 .main {
-  flex:1; overflow:hidden; padding:4px 14px 0;
-  display:flex; flex-direction:column; gap:8px;
+  flex: 1;
+  min-height: 0;          /* allow flex child to shrink */
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 2px 14px 6px;
+  padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
+  overflow: hidden;
 }
 
-/* CARD */
+/* ── CARD ─────────────────────────────────────── */
 .card {
-  background:var(--card); border:1px solid var(--border);
-  border-radius:var(--r); padding:12px 14px;
-  position:relative; overflow:hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 13px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
 }
 .card::before {
   content:''; position:absolute; inset:0;
   background:linear-gradient(135deg,rgba(255,255,255,0.025) 0%,transparent 60%);
   pointer-events:none;
 }
+
+/* build card takes remaining space */
+.card-build { flex: 1; min-height: 0; }
+
 .card-title {
-  font-family:var(--mono); font-size:8px; font-weight:700;
-  letter-spacing:1.4px; color:var(--t3); text-transform:uppercase;
-  margin-bottom:10px; display:flex; align-items:center; gap:7px;
+  font-family:var(--mono); font-size:7.5px; font-weight:700;
+  letter-spacing:1.3px; color:var(--t3); text-transform:uppercase;
+  margin-bottom:8px; display:flex; align-items:center; gap:6px;
 }
 .card-title::after { content:''; flex:1; height:1px; background:var(--border); }
 
-/* GRID */
-.two-col { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+/* ── 2 COL ────────────────────────────────────── */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
 
-/* FIELD */
-.field { display:flex; flex-direction:column; gap:5px; }
+/* ── FIELD ────────────────────────────────────── */
+.field { display:flex; flex-direction:column; gap:4px; }
+
 .flabel {
-  font-size:10px; font-weight:600; color:var(--t2);
+  font-size:9.5px; font-weight:600; color:var(--t2);
   display:flex; align-items:center; justify-content:space-between;
 }
+
 .token-toggle {
-  font-family:var(--mono); font-size:8px; font-weight:700;
+  font-family:var(--mono); font-size:7.5px; font-weight:700;
   color:var(--accent); background:rgba(56,189,248,0.1);
-  border:1px solid rgba(56,189,248,0.2); padding:2px 9px;
-  border-radius:20px; cursor:pointer;
+  border:1px solid rgba(56,189,248,0.2); padding:2px 8px;
+  border-radius:20px; cursor:pointer; white-space:nowrap;
 }
 .save-badge {
-  font-family:var(--mono); font-size:8px; font-weight:700;
+  font-family:var(--mono); font-size:7.5px; font-weight:700;
   color:var(--green); background:rgba(52,211,153,0.1);
-  border:1px solid rgba(52,211,153,0.2); padding:2px 9px;
-  border-radius:20px; display:none;
+  border:1px solid rgba(52,211,153,0.2); padding:2px 8px;
+  border-radius:20px; display:none; white-space:nowrap;
 }
 
 input[type="text"], input[type="password"] {
-  width:100%; padding:9px 11px; border-radius:var(--rm);
+  width:100%; padding:8px 10px; border-radius:10px;
   border:1px solid var(--border); background:var(--inp);
   color:var(--t1); font-family:var(--mono); font-size:11px;
   outline:none; transition:all 0.18s; -webkit-appearance:none;
 }
-input::placeholder { color:var(--t3); }
-input:focus { border-color:var(--bact); box-shadow:0 0 0 3px rgba(56,189,248,0.08); }
+input::placeholder { color:var(--t3); font-size:10px; }
+input:focus { border-color:var(--bact); box-shadow:0 0 0 2px rgba(56,189,248,0.1); }
 
-/* SAVE ROW */
-.save-row { display:flex; gap:8px; margin-top:10px; }
+/* ── SAVE ROW ─────────────────────────────────── */
+.save-row { display:flex; gap:8px; margin-top:9px; }
 
-/* BUTTONS */
-button { border:none; cursor:pointer; font-family:var(--sans); font-weight:600; transition:all 0.18s; -webkit-appearance:none; }
+/* ── BUTTONS ──────────────────────────────────── */
+button {
+  border:none; cursor:pointer;
+  font-family:var(--sans); font-weight:600;
+  transition:all 0.18s; -webkit-appearance:none;
+}
 button:active { transform:scale(0.96); }
 
-.btn-save { flex:1; padding:9px 0; font-size:12px; background:var(--accent); color:#071525; border-radius:30px; }
+.btn-save {
+  flex:1; padding:8px 0; font-size:12px;
+  background:var(--accent); color:#071525; border-radius:30px;
+}
 .btn-save.saved { background:var(--green); color:#062012; }
-.btn-clear { flex:1; padding:9px 0; font-size:12px; background:var(--ele); color:var(--t2); border-radius:30px; border:1px solid var(--border); }
 
-/* FILE PICK */
+.btn-clear {
+  flex:1; padding:8px 0; font-size:12px;
+  background:var(--ele); color:var(--t2);
+  border-radius:30px; border:1px solid var(--border);
+}
+
+/* ── FILE PICK ────────────────────────────────── */
 .file-pick {
-  display:flex; align-items:center; gap:10px; padding:9px 12px;
-  border-radius:var(--rm); border:1.5px dashed var(--border);
+  display:flex; align-items:center; gap:9px; padding:8px 11px;
+  border-radius:10px; border:1.5px dashed var(--border);
   background:var(--inp); cursor:pointer; position:relative; transition:all 0.18s;
 }
 .file-pick.has-file { border-color:rgba(52,211,153,0.35); background:rgba(52,211,153,0.04); }
 .file-pick input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-.file-icon { font-size:18px; flex-shrink:0; }
+.file-icon { font-size:17px; flex-shrink:0; }
 .file-info { flex:1; overflow:hidden; }
 .file-info-title { font-size:11px; font-weight:600; color:var(--t2); }
 .file-info-sub { font-family:var(--mono); font-size:9px; color:var(--t3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .file-info-sub.ok { color:var(--green); }
 
-/* BUILD BTN */
+/* ── BUILD BTN ────────────────────────────────── */
 .btn-build {
-  width:100%; padding:13px; font-size:14px; font-weight:700;
+  width:100%; padding:12px; font-size:14px; font-weight:700;
   background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff;
-  border-radius:var(--rm); box-shadow:0 4px 20px rgba(34,197,94,0.2);
+  border-radius:11px; box-shadow:0 3px 16px rgba(34,197,94,0.22);
 }
-.btn-build:disabled { background:#0c2014; color:#235234; box-shadow:none; transform:none; cursor:not-allowed; }
+.btn-build:disabled {
+  background:#0c2014; color:#1e4a28;
+  box-shadow:none; transform:none; cursor:not-allowed;
+}
 
-/* PROGRESS */
-.progress-wrap { display:none; margin-top:8px; }
+/* ── PROGRESS ─────────────────────────────────── */
+.progress-wrap { display:none; margin-top:7px; }
 .progress-track { height:3px; background:var(--ele); border-radius:3px; overflow:hidden; }
-.progress-fill { height:100%; background:linear-gradient(90deg,var(--green),var(--accent)); border-radius:3px; width:0%; transition:width 0.4s ease; }
-.progress-row { display:flex; justify-content:space-between; margin-top:4px; }
-.progress-label { font-family:var(--mono); font-size:9px; color:var(--t3); }
+.progress-fill {
+  height:100%; background:linear-gradient(90deg,var(--green),var(--accent));
+  border-radius:3px; width:0%; transition:width 0.4s ease;
+}
+.progress-row { display:flex; justify-content:space-between; margin-top:3px; }
+.progress-label { font-family:var(--mono); font-size:8.5px; color:var(--t3); }
 
-/* LOADER */
-.loader { display:none; gap:4px; justify-content:center; margin:6px 0 2px; }
+/* ── LOADER ───────────────────────────────────── */
+.loader { display:none; gap:4px; justify-content:center; margin:5px 0 2px; }
 .loader.on { display:flex; }
 .dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:pulse 1.4s ease-in-out infinite; }
 .dot:nth-child(2) { animation-delay:.2s; background:var(--accent2); }
 .dot:nth-child(3) { animation-delay:.4s; background:var(--green); }
 @keyframes pulse { 0%,80%,100%{transform:scale(0.4);opacity:0.3;} 40%{transform:scale(1);opacity:1;} }
 
-/* STATUS */
+/* ── STATUS ───────────────────────────────────── */
 .status-box {
-  padding:8px 11px; border-radius:var(--rm); background:var(--ele);
-  border:1px solid var(--border); font-family:var(--mono); font-size:10px;
-  color:var(--t2); word-break:break-word; line-height:1.55; margin-top:8px; transition:all 0.2s;
+  padding:7px 10px; border-radius:10px; background:var(--ele);
+  border:1px solid var(--border); font-family:var(--mono);
+  font-size:10px; color:var(--t2); word-break:break-word;
+  line-height:1.5; margin-top:7px; transition:all 0.2s;
 }
 .status-box.error   { color:var(--red);   background:rgba(248,113,113,0.06); border-color:rgba(248,113,113,0.18); }
 .status-box.success { color:var(--green); background:rgba(52,211,153,0.06);  border-color:rgba(52,211,153,0.18); }
 .status-box.info    { color:var(--accent);background:rgba(56,189,248,0.06);  border-color:rgba(56,189,248,0.18); }
 
-/* DOWNLOAD */
+/* ── DOWNLOAD ─────────────────────────────────── */
 .btn-download {
-  width:100%; padding:12px; font-size:13px; font-weight:700;
+  width:100%; padding:11px; font-size:13px; font-weight:700;
   background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff;
-  border-radius:var(--rm); box-shadow:0 4px 16px rgba(59,130,246,0.18); margin-top:8px;
+  border-radius:11px; box-shadow:0 3px 14px rgba(59,130,246,0.2); margin-top:7px;
 }
-.btn-download:disabled { background:#091a38; color:#1e3a70; box-shadow:none; transform:none; cursor:not-allowed; }
+.btn-download:disabled {
+  background:#091a38; color:#1a3060;
+  box-shadow:none; transform:none; cursor:not-allowed;
+}
 
 .btn-install {
-  width:100%; padding:10px; font-size:12px; background:var(--ele);
-  color:var(--accent2); border:1px solid rgba(129,140,248,0.25);
-  border-radius:var(--rm); margin-top:7px; display:none;
+  width:100%; padding:9px; font-size:12px;
+  background:var(--ele); color:var(--accent2);
+  border:1px solid rgba(129,140,248,0.25);
+  border-radius:11px; margin-top:6px; display:none;
 }
 .btn-install.show { display:block; }
 
-/* FOOTER */
+/* ── FOOTER ── ~22dp ──────────────────────────── */
 .footer {
-  flex-shrink:0; text-align:center; font-family:var(--mono);
-  font-size:9px; color:var(--t3); padding:6px 0;
-  padding-bottom:max(6px, env(safe-area-inset-bottom)); letter-spacing:0.4px;
+  flex-shrink:0; text-align:center;
+  font-family:var(--mono); font-size:8.5px; color:var(--t3);
+  padding:4px 0 max(4px, env(safe-area-inset-bottom, 0px));
+  letter-spacing:0.4px;
 }
 </style>
 </head>
 <body>
 
+<!-- TOPBAR -->
 <div class="topbar">
   <div class="logo">
     <img src="icon/icon-192.png" class="logo-img"
@@ -228,6 +279,7 @@ button:active { transform:scale(0.96); }
   <button class="pwa-chip" id="installBtn" onclick="installPWA()">+ INSTALL</button>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 
   <!-- 01 KONFIGURASI -->
@@ -236,7 +288,7 @@ button:active { transform:scale(0.96); }
     <div class="two-col">
       <div class="field">
         <div class="flabel">
-          Token
+          GitHub Token
           <span class="token-toggle" onclick="toggleToken()">👁 Lihat</span>
         </div>
         <input type="password" id="token" placeholder="ghp_xxx..." oninput="markUnsaved()">
@@ -244,7 +296,7 @@ button:active { transform:scale(0.96); }
       </div>
       <div class="field">
         <div class="flabel">
-          Repo
+          Repo Workflow
           <span class="save-badge" id="repoSaved">✓ Simpan</span>
         </div>
         <input type="text" id="workflowRepo" placeholder="user/repo" oninput="markUnsaved()">
@@ -266,20 +318,21 @@ button:active { transform:scale(0.96); }
         <div class="file-icon" id="fileIcon">📂</div>
         <div class="file-info">
           <div class="file-info-title" id="fileTitle">Pilih file ZIP project</div>
-          <div class="file-info-sub" id="fileSub">Tap untuk browse</div>
+          <div class="file-info-sub" id="fileSub">Tap untuk browse · format .zip</div>
         </div>
       </div>
     </div>
-    <div class="field" style="margin-top:8px">
+    <div class="field" style="margin-top:7px">
       <div class="flabel">Nama App</div>
-      <input type="text" id="appName" placeholder="my-app">
+      <input type="text" id="appName" placeholder="contoh: my-app">
     </div>
   </div>
 
   <!-- 03 BUILD -->
-  <div class="card">
-    <div class="card-title">03 — Build</div>
+  <div class="card card-build">
+    <div class="card-title">03 — Build &amp; Download</div>
     <button class="btn-build" id="btnBuild" onclick="startBuild()">⚡ Upload &amp; Build APK</button>
+
     <div class="progress-wrap" id="progressBar">
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
       <div class="progress-row">
@@ -287,16 +340,20 @@ button:active { transform:scale(0.96); }
         <span class="progress-label">GitHub Actions</span>
       </div>
     </div>
+
     <div class="loader" id="loader">
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
+
     <div class="status-box" id="status">✅ Siap membangun APK</div>
+
     <button class="btn-download" id="btnDownload" onclick="downloadApk()" disabled>📦 Download APK</button>
     <button class="btn-install" id="installBtnBottom" onclick="installPWA()">📱 Install Aplikasi</button>
   </div>
 
 </div>
 
+<!-- FOOTER -->
 <div class="footer">APK Builder Pro · PWA · v2.0</div>
 
 <script>
@@ -327,7 +384,8 @@ function onFileSelect(input){
   const file=input.files[0]; if(!file)return;
   document.getElementById('filePick').classList.add('has-file');
   document.getElementById('fileIcon').textContent='✅';
-  const name=file.name; document.getElementById('fileTitle').textContent=name.length>22?name.substring(0,22)+'…':name;
+  const name=file.name;
+  document.getElementById('fileTitle').textContent=name.length>24?name.substring(0,24)+'…':name;
   const sub=document.getElementById('fileSub');
   sub.textContent=(file.size/1024/1024).toFixed(2)+' MB'; sub.classList.add('ok');
 }
@@ -336,25 +394,21 @@ function setStatus(msg,type=''){
   const el=document.getElementById('status');
   el.textContent=msg; el.className='status-box'+(type?' '+type:'');
 }
-
 function setProgress(pct){
   const wrap=document.getElementById('progressBar');
   wrap.style.display=pct>0?'block':'none';
   document.getElementById('progressFill').style.width=pct+'%';
   document.getElementById('progressPct').textContent=pct+'%';
 }
-
 function setLoading(on){
   const l=document.getElementById('loader');
   on?l.classList.add('on'):l.classList.remove('on');
 }
-
 function toggleToken(){
   const el=document.getElementById('token'),t=document.querySelector('.token-toggle');
   if(el.type==='password'){el.type='text';t.textContent='🙈 Tutup';}
   else{el.type='password';t.textContent='👁 Lihat';}
 }
-
 function saveSettings(){
   const token=document.getElementById('token').value.trim();
   const repo=document.getElementById('workflowRepo').value.trim();
@@ -367,16 +421,13 @@ function saveSettings(){
   setTimeout(()=>{btn.textContent='💾 Simpan';btn.classList.remove('saved');},1800);
   setStatus('✅ Pengaturan disimpan!','success');
 }
-
 function clearSettings(){
   localStorage.removeItem('apk_token'); localStorage.removeItem('apk_repo');
-  document.getElementById('token').value='';
-  document.getElementById('workflowRepo').value='';
+  document.getElementById('token').value=''; document.getElementById('workflowRepo').value='';
   document.getElementById('tokenSaved').style.display='none';
   document.getElementById('repoSaved').style.display='none';
   setStatus('🗑 Pengaturan dihapus.','info');
 }
-
 function loadSettings(){
   const token=localStorage.getItem('apk_token');
   const repo=localStorage.getItem('apk_repo');
@@ -384,17 +435,14 @@ function loadSettings(){
   if(repo)document.getElementById('workflowRepo').value=repo;
   if(token||repo)showSavedBadges();
 }
-
 function showSavedBadges(){
   document.getElementById('tokenSaved').style.display=localStorage.getItem('apk_token')?'inline-block':'none';
   document.getElementById('repoSaved').style.display=localStorage.getItem('apk_repo')?'inline-block':'none';
 }
-
 function markUnsaved(){
   document.getElementById('tokenSaved').style.display='none';
   document.getElementById('repoSaved').style.display='none';
 }
-
 function getInputs(){
   return{
     token:document.getElementById('token').value.trim(),
@@ -403,36 +451,30 @@ function getInputs(){
     appName:document.getElementById('appName').value.trim()||'my-app'
   };
 }
-
 async function uploadToRelease(token,owner,repo,file,appName){
-  const tag=`build-${appName}-${Date.now()}`;
-  const filePath=`uploads/${tag}.zip`;
-  setStatus('📦 Encoding ZIP...','info'); setProgress(15);
-  const arrayBuffer=await file.arrayBuffer();
-  const bytes=new Uint8Array(arrayBuffer);
-  let binary=''; const chunk=8192;
+  const tag=`build-${appName}-${Date.now()}`;const filePath=`uploads/${tag}.zip`;
+  setStatus('📦 Encoding ZIP...','info');setProgress(15);
+  const arrayBuffer=await file.arrayBuffer();const bytes=new Uint8Array(arrayBuffer);
+  let binary='';const chunk=8192;
   for(let i=0;i<bytes.length;i+=chunk)binary+=String.fromCharCode(...bytes.subarray(i,i+chunk));
   const base64Content=btoa(binary);
-  setStatus('⬆️ Upload ke GitHub...','info'); setProgress(30);
+  setStatus('⬆️ Upload ke GitHub...','info');setProgress(30);
   let sha;
   const checkRes=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
     {headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json'}});
   if(checkRes.ok)sha=(await checkRes.json()).sha;
-  const body={message:`Upload ${file.name}`,content:base64Content};
-  if(sha)body.sha=sha;
+  const body={message:`Upload ${file.name}`,content:base64Content};if(sha)body.sha=sha;
   const uploadRes=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,{
     method:'PUT',
     headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},
     body:JSON.stringify(body)
   });
   if(!uploadRes.ok){const err=await uploadRes.json().catch(()=>({}));throw new Error('Upload gagal: '+(err.message||uploadRes.status));}
-  const asset=await uploadRes.json();
-  setProgress(48);
+  const asset=await uploadRes.json();setProgress(48);
   return{zipUrl:asset.content.download_url};
 }
-
 async function triggerWorkflow(token,owner,repo,zipUrl,appName){
-  setStatus('🚀 Memicu GitHub Actions...','info'); setProgress(55);
+  setStatus('🚀 Memicu GitHub Actions...','info');setProgress(55);
   const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/dispatches`,{
     method:'POST',
     headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},
@@ -440,9 +482,8 @@ async function triggerWorkflow(token,owner,repo,zipUrl,appName){
   });
   if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error('Trigger gagal: '+(err.message||res.status));}
 }
-
 async function waitForRunId(token,owner,repo){
-  setStatus('⏳ Menunggu workflow...','info'); setProgress(65);
+  setStatus('⏳ Menunggu workflow...','info');setProgress(65);
   for(let i=0;i<22;i++){
     await sleep(4500);
     const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/runs?event=repository_dispatch&per_page=1`,
@@ -452,9 +493,8 @@ async function waitForRunId(token,owner,repo){
   }
   throw new Error('Timeout: Actions tidak merespon (100s)');
 }
-
 async function waitForBuild(token,owner,repo,rid){
-  setStatus('🔨 Compile APK...','info'); setProgress(72);
+  setStatus('🔨 Compile APK...','info');setProgress(72);
   for(let i=0;i<55;i++){
     await sleep(9000);
     const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/runs/${rid}`,
@@ -469,9 +509,8 @@ async function waitForBuild(token,owner,repo,rid){
   }
   throw new Error('Timeout: Build > 8 menit');
 }
-
 async function getArtifactUrl(token,owner,repo,rid){
-  setStatus('📥 Ambil link download...','info'); setProgress(95);
+  setStatus('📥 Ambil link download...','info');setProgress(95);
   for(let i=0;i<12;i++){
     await sleep(4000);
     const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/apk-result.json`,
@@ -483,7 +522,6 @@ async function getArtifactUrl(token,owner,repo,rid){
   }
   throw new Error('Link APK tidak ditemukan');
 }
-
 async function startBuild(){
   const{token,workflowRepo,file,appName}=getInputs();
   if(!token)return setStatus('❌ Masukkan GitHub Token!','error');
@@ -492,9 +530,8 @@ async function startBuild(){
   const[owner,repo]=workflowRepo.split('/');
   const buildBtn=document.getElementById('btnBuild');
   const downloadBtn=document.getElementById('btnDownload');
-  buildBtn.disabled=true; downloadBtn.disabled=true;
-  setLoading(true); setProgress(8);
-  runId=null; artifactUrl=null;
+  buildBtn.disabled=true;downloadBtn.disabled=true;
+  setLoading(true);setProgress(8);runId=null;artifactUrl=null;
   try{
     const{zipUrl}=await uploadToRelease(token,owner,repo,file,appName);
     await triggerWorkflow(token,owner,repo,zipUrl,appName);
@@ -505,22 +542,18 @@ async function startBuild(){
     setStatus('✅ APK siap! Klik Download.','success');
     downloadBtn.disabled=false;
   }catch(err){
-    setStatus('❌ '+err.message,'error');
-    setProgress(0);
+    setStatus('❌ '+err.message,'error');setProgress(0);
   }finally{
-    setLoading(false);
-    buildBtn.disabled=false;
+    setLoading(false);buildBtn.disabled=false;
   }
 }
-
 function downloadApk(){
   if(!artifactUrl)return setStatus('⚠️ Build dulu sebelum download.','error');
   const a=document.createElement('a');
-  a.href=artifactUrl; a.download=''; a.target='_blank';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  a.href=artifactUrl;a.download='';a.target='_blank';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
   setStatus('📲 Download dimulai!','success');
 }
-
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 </script>
 </body>
