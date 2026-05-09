@@ -1,19 +1,43 @@
-name: Build APK
+name: Build APK from uploaded ZIP
 
 on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
+  repository_dispatch:
+    types: [build-apk]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: Checkout code (only for existing repo content)
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    
+    - name: Get client payload
+      id: payload
+      run: |
+        ZIP_URL="${{ github.event.client_payload.zip_url }}"
+        REPO_FULL="${{ github.event.client_payload.repo }}"
+        echo "ZIP_URL=${ZIP_URL}" >> $GITHUB_ENV
+        echo "REPO_FULL=${REPO_FULL}" >> $GITHUB_ENV
+        if [ -z "$ZIP_URL" ]; then
+          echo "No zip_url provided, using existing files (if any)"
+        fi
+    
+    - name: Download and extract project ZIP
+      if: env.ZIP_URL != ''
+      run: |
+        echo "Downloading from $ZIP_URL"
+        curl -L "$ZIP_URL" -o project.zip
+        unzip -o project.zip -d ./project
+        # Pindahkan isi project ke root (overwrite jika ada)
+        rsync -av ./project/ ./ --remove-source-files
+        rm -rf project project.zip
+        echo "Extracted project files"
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -37,22 +61,20 @@ jobs:
         npm ci || npm install
         npm install -g @capacitor/cli
     
-    - name: Build web app
+    - name: Build web app (if build script exists)
       run: |
-        # Cek apakah ada script build
         if npm run | grep -q " build"; then
           npm run build
         else
-          echo "No build script found, using current files"
+          echo "No build script found, using current files as web root"
         fi
     
     - name: Sync Capacitor
       run: |
-        # Cek apakah sudah ada config capacitor
         if [ -f capacitor.config.json ]; then
           npx cap sync android
         else
-          echo "capacitor.config.json not found"
+          echo "capacitor.config.json not found!"
           exit 1
         fi
     
@@ -67,26 +89,12 @@ jobs:
           exit 1
         fi
     
-    - name: List APK files
-      run: |
-        find . -name "*.apk" -ls
-    
-    - name: Upload APK
+    - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug
+        name: apk-${{ github.run_id }}
         path: |
           android/app/build/outputs/apk/debug/*.apk
           app/build/outputs/apk/debug/*.apk
         if-no-files-found: error
-        compression-level: 0
-        retention-days: 7
-    
-    - name: Upload APK (alternative path)
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: apk-files
-        path: "**/*.apk"
-        if-no-files-found: warn
         retention-days: 7
