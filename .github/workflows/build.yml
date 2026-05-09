@@ -84,9 +84,16 @@ jobs:
         APK_PATH=$(find android/app/build/outputs/apk/debug/ -name "*.apk" | head -1)
         APK_NAME="${{ env.APP_NAME }}-${{ github.run_id }}.apk"
         echo "📤 Mengupload APK ke file.io..."
-        RESPONSE=$(curl -s -F "file=@${APK_PATH};filename=${APK_NAME}" "https://file.io/?expires=14d")
+        RESPONSE=$(curl -s --max-time 120 -F "file=@${APK_PATH};filename=${APK_NAME}" "https://file.io/?expires=14d")
         echo "Response: $RESPONSE"
-        DOWNLOAD_URL=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('link',''))")
+        # Cek sukses
+        SUCCESS=$(echo "$RESPONSE" | grep -o '"success":true' || true)
+        if [ -z "$SUCCESS" ]; then
+          echo "❌ Upload gagal. Response: $RESPONSE"
+          exit 1
+        fi
+        # Ambil link dengan grep+sed (tidak pakai python)
+        DOWNLOAD_URL=$(echo "$RESPONSE" | grep -o '"link":"[^"]*"' | sed 's/"link":"//;s/"//')
         echo "download_url=${DOWNLOAD_URL}" >> $GITHUB_OUTPUT
         echo "=========================================="
         echo "✅ APK SIAP DIDOWNLOAD!"
