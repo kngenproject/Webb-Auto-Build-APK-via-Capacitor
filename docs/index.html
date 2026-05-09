@@ -2,395 +2,730 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<title>APK Builder Pro · Compact</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>APK Builder Pro</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
+<meta name="theme-color" content="#080d1a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="APK Builder">
 <link rel="apple-touch-icon" href="icon/icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+  --bg-base:    #080d1a;
+  --bg-card:    #0e1628;
+  --bg-input:   #060b17;
+  --bg-ele:     #111d35;
+  --border:     rgba(255,255,255,0.07);
+  --border-act: rgba(56,189,248,0.5);
+  --accent:     #38bdf8;
+  --accent2:    #818cf8;
+  --green:      #34d399;
+  --red:        #f87171;
+  --amber:      #fbbf24;
+  --text-pri:   #f0f6ff;
+  --text-sec:   #8b99b5;
+  --text-muted: #3d4f6e;
+  --mono:       'Space Mono', monospace;
+  --sans:       'DM Sans', system-ui, sans-serif;
+  --radius-lg:  20px;
+  --radius-md:  14px;
+  --radius-sm:  10px;
+  --radius-xs:  8px;
 }
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html { height: 100%; }
 
 body {
-  background: linear-gradient(135deg, #0f172a, #020617);
-  font-family: 'Segoe UI', system-ui, -apple-system, 'Roboto', sans-serif;
-  color: #e2e8f0;
-  overflow: hidden;           /* core: prevent body scroll */
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1.2;
+  font-family: var(--sans);
+  background: var(--bg-base);
+  color: var(--text-pri);
+  min-height: 100%;
+  overflow-x: hidden;
+  /* subtle noise texture via gradient */
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(56,189,248,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(129,140,248,0.06) 0%, transparent 50%);
 }
 
-.container {
-  width: 100%;
-  max-width: 520px;
+/* ─── SCROLLBAR ─────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+
+/* ─── PAGE WRAPPER ──────────────────────────────── */
+.page {
+  max-width: 480px;
   margin: 0 auto;
-  padding: 0 14px;
+  padding: env(safe-area-inset-top, 0px) 16px env(safe-area-inset-bottom, 24px);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── TOPBAR ────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: linear-gradient(to bottom, var(--bg-base) 80%, transparent);
+  padding-top: env(safe-area-inset-top, 20px);
+}
+
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  font-size: 18px;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px rgba(56,189,248,0.3);
+}
+
+.logo-text {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-pri);
+}
+
+.logo-text span {
+  color: var(--accent);
+}
+
+.pwa-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(56,189,248,0.1);
+  border: 1px solid rgba(56,189,248,0.25);
+  border-radius: 30px;
+  padding: 5px 12px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  display: none;
+  transition: all 0.2s;
+}
+.pwa-btn.show { display: block; }
+.pwa-btn:active { transform: scale(0.96); background: rgba(56,189,248,0.2); }
+
+/* ─── SECTION CARD ──────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 12px;
+  position: relative;
   overflow: hidden;
 }
 
-.card {
-  background: rgba(30, 41, 59, 0.88);
-  backdrop-filter: blur(12px);
-  border-radius: 26px;
-  padding: 14px 18px 20px;
-  box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.6);
-  width: 100%;
-  border: 1px solid rgba(71, 85, 105, 0.3);
-  transition: all 0.2s;
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+  pointer-events: none;
 }
 
-/* header */
-h1 {
-  font-size: 22px;
-  text-align: center;
-  margin-bottom: 2px;
-  letter-spacing: -0.3px;
+.card-label {
+  font-family: var(--mono);
+  font-size: 9px;
   font-weight: 700;
-  background: linear-gradient(135deg, #f0f9ff, #b9e6ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.subtitle {
-  text-align: center;
-  font-size: 10px;
-  color: #94a3b8;
-  margin-bottom: 12px;
+.card-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ─── FIELD ─────────────────────────────────────── */
+.field {
+  margin-bottom: 14px;
+}
+.field:last-child { margin-bottom: 0; }
+
+.field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-sec);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   letter-spacing: 0.2px;
 }
 
-/* compact grid for token & repo */
-.two-col-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.field {
-  margin-top: 0;
-}
-
-.field label {
-  font-size: 10px;
-  font-weight: 500;
-  color: #9ca3af;
+.field-label-left {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
-  letter-spacing: 0.3px;
-}
-
-input[type="text"], input[type="password"] {
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 12px;
-  border: 1px solid #1e293b;
-  background: #0b1120;
-  color: white;
-  font-size: 12px;
-  font-weight: 500;
-  outline: none;
-  transition: 0.15s;
-}
-
-input:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
+  gap: 5px;
 }
 
 .token-toggle {
+  font-family: var(--mono);
   font-size: 9px;
-  color: #60a5fa;
+  font-weight: 700;
+  color: var(--accent);
   cursor: pointer;
-  background: rgba(37,99,235,0.2);
-  padding: 2px 8px;
-  border-radius: 30px;
-  transition: 0.1s;
+  background: rgba(56,189,248,0.1);
+  border: 1px solid rgba(56,189,248,0.2);
+  padding: 3px 10px;
+  border-radius: 20px;
+  transition: all 0.15s;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
+.token-toggle:active { background: rgba(56,189,248,0.2); }
 
 .save-badge {
+  font-family: var(--mono);
   font-size: 9px;
-  color: #4ade80;
-  background: #14532d;
-  padding: 2px 8px;
-  border-radius: 30px;
-  font-weight: normal;
-  display: inline-block;
-}
-
-/* save row */
-.save-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.btn-save, .btn-clear {
-  flex: 1;
-  padding: 8px 0;
-  border-radius: 40px;
-  font-size: 12px;
-  font-weight: 600;
-  margin-top: 0;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-save {
-  background: #0ea5e9;
-  color: white;
-}
-.btn-save:hover { background: #0284c7; }
-.btn-save.saved { background: #166534; color: #bbf7d0; }
-
-.btn-clear {
-  background: #1e293b;
-  color: #cbd5e1;
-}
-.btn-clear:hover { background: #334155; }
-
-/* divider */
-.divider {
-  border: none;
-  border-top: 1px solid rgba(51, 65, 85, 0.6);
-  margin: 12px 0;
-}
-
-/* file & app name */
-.field-file, .field-appname {
-  margin-top: 8px;
-}
-input[type="file"] {
-  width: 100%;
-  padding: 8px 8px;
-  border-radius: 12px;
-  border: 1px solid #1e293b;
-  background: #0b1120;
-  color: #94a3b8;
-  font-size: 11px;
-  cursor: pointer;
-}
-
-/* build button */
-.btn-build {
-  background: #22c55e;
-  color: black;
-  padding: 10px;
-  margin-top: 12px;
-  font-weight: bold;
-  font-size: 14px;
-  border-radius: 40px;
-  transition: 0.2s;
-}
-.btn-build:disabled {
-  background: #166534;
-  color: #86efac;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* progress & loader compact */
-.progress {
-  display: none;
-  margin-top: 8px;
-  background: #1e293b;
-  border-radius: 30px;
-  height: 5px;
-  overflow: hidden;
-}
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #22c55e, #3b82f6);
-  border-radius: 30px;
-  width: 0%;
-}
-
-.loader {
-  display: none;
-  text-align: center;
-  margin-top: 6px;
-}
-.loader div {
-  width: 7px;
-  height: 7px;
-  margin: 2px;
-  background: #22c55e;
-  border-radius: 50%;
-  display: inline-block;
-  animation: bounce 1.2s infinite ease-in-out;
-}
-@keyframes bounce {
-  0%,80%,100% { transform: scale(0); }
-  40% { transform: scale(1); }
-}
-
-.status-box {
-  margin-top: 10px;
-  padding: 8px 12px;
+  font-weight: 700;
+  color: var(--green);
+  background: rgba(52,211,153,0.1);
+  border: 1px solid rgba(52,211,153,0.25);
+  padding: 3px 10px;
   border-radius: 20px;
-  background: #0a0f1c;
-  font-size: 11px;
-  font-weight: 500;
-  color: #94a3b8;
-  min-height: 38px;
-  word-break: break-word;
-  line-height: 1.3;
-}
-.status-box.error { color: #f87171; background: #2c0f14; }
-.status-box.success { color: #4ade80; background: #0a2618; }
-.status-box.info { color: #60a5fa; background: #0f172a; }
-
-/* download & install buttons */
-.btn-download, .btn-install {
-  padding: 9px;
-  margin-top: 10px;
-  border-radius: 40px;
-  font-weight: bold;
-  font-size: 14px;
-  transition: 0.2s;
-}
-.btn-download {
-  background: #3b82f6;
-  color: white;
-}
-.btn-download:disabled {
-  background: #1e3a5f;
-  color: #7aa2f7;
-  cursor: not-allowed;
-}
-.btn-install {
-  background: #8b5cf6;
-  color: white;
   display: none;
-}
-.btn-install.show {
-  display: block;
-}
-
-/* footer ultra compact */
-.footer {
-  text-align: center;
-  font-size: 9px;
-  color: #475569;
-  margin-top: 12px;
   letter-spacing: 0.3px;
 }
 
-/* no external scroll ever */
-::-webkit-scrollbar {
-  display: none;
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-pri);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  outline: none;
+  transition: all 0.2s;
+  -webkit-appearance: none;
 }
 
-/* additional micro adjustments */
-button:active { transform: scale(0.97); }
-button {
-  cursor: pointer;
-  border: none;
+input[type="text"]::placeholder,
+input[type="password"]::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
 }
-.field label span {
+
+input:focus {
+  border-color: var(--border-act);
+  background: #070c18;
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.1), inset 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* ─── FILE INPUT ────────────────────────────────── */
+.file-drop {
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  padding: 18px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-drop.has-file {
+  border-color: rgba(52,211,153,0.4);
+  background: rgba(52,211,153,0.04);
+}
+
+.file-drop:active { transform: scale(0.99); }
+
+.file-drop input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.file-drop-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+
+.file-drop-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-sec);
+  margin-bottom: 2px;
+}
+
+.file-drop-hint {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.file-name {
+  display: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--green);
+  font-weight: 700;
+  word-break: break-all;
+}
+
+/* ─── BUTTONS ───────────────────────────────────── */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-weight: 600;
+  border-radius: 40px;
+  transition: all 0.2s;
+  -webkit-appearance: none;
+}
+button:active { transform: scale(0.97); }
+
+.btn-save {
+  flex: 1;
+  padding: 11px 0;
+  font-size: 13px;
+  background: var(--accent);
+  color: #07111f;
+  letter-spacing: 0.1px;
+}
+.btn-save:active { background: #29a8db; }
+.btn-save.saved { background: var(--green); color: #062012; }
+
+.btn-clear {
+  flex: 1;
+  padding: 11px 0;
+  font-size: 13px;
+  background: var(--bg-ele);
+  color: var(--text-sec);
+  border: 1px solid var(--border);
+}
+.btn-clear:active { background: #1a2840; }
+
+.btn-build {
+  width: 100%;
+  padding: 15px;
+  font-size: 15px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  border-radius: var(--radius-md);
+  letter-spacing: 0.2px;
+  box-shadow: 0 4px 24px rgba(34,197,94,0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-build::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transition: left 0.4s;
+}
+
+.btn-build:not(:disabled):active::before { left: 100%; }
+
+.btn-build:disabled {
+  background: #0d2a16;
+  color: #2d6e45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-download {
+  width: 100%;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 20px rgba(59,130,246,0.2);
+  margin-top: 12px;
+}
+
+.btn-download:disabled {
+  background: #0a1a38;
+  color: #2a4a80;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ─── PROGRESS ──────────────────────────────────── */
+.progress-wrap {
+  display: none;
+  margin-top: 12px;
+}
+
+.progress-track {
+  height: 4px;
+  background: var(--bg-ele);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--accent));
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.4s ease;
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+.progress-pct {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 5px;
+}
+
+/* ─── LOADER DOTS ───────────────────────────────── */
+.loader {
+  display: none;
+  gap: 5px;
+  justify-content: center;
+  margin: 10px 0 4px;
+}
+
+.loader.active { display: flex; }
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; background: var(--accent2); }
+.dot:nth-child(3) { animation-delay: 0.4s; background: var(--green); }
+
+@keyframes pulse {
+  0%, 80%, 100% { transform: scale(0.5); opacity: 0.3; }
+  40% { transform: scale(1.1); opacity: 1; }
+}
+
+/* ─── STATUS BOX ────────────────────────────────── */
+.status-box {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-ele);
+  border: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-sec);
+  word-break: break-word;
+  line-height: 1.6;
+  min-height: 44px;
+  transition: all 0.25s;
+}
+
+.status-box.error {
+  color: var(--red);
+  background: rgba(248,113,113,0.06);
+  border-color: rgba(248,113,113,0.2);
+}
+.status-box.success {
+  color: var(--green);
+  background: rgba(52,211,153,0.06);
+  border-color: rgba(52,211,153,0.2);
+}
+.status-box.info {
+  color: var(--accent);
+  background: rgba(56,189,248,0.06);
+  border-color: rgba(56,189,248,0.2);
+}
+
+/* ─── FOOTER ────────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 20px 0 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  margin-top: auto;
+}
+
+.footer span { color: var(--text-muted); }
+
+/* ─── STEP INDICATOR ────────────────────────────── */
+.steps {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+}
+
+.step-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg-ele);
+  border: 1.5px solid var(--border);
   display: flex;
   align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  z-index: 1;
+  position: relative;
+}
+
+.step.active .step-dot {
+  background: rgba(56,189,248,0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px rgba(56,189,248,0.2);
+}
+
+.step-label {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.step.active .step-label { color: var(--accent); }
+
+.step-line {
+  height: 1.5px;
+  background: var(--border);
+  flex: 1;
+  margin: 0 -2px;
+  position: relative;
+  top: -10px;
+  z-index: 0;
+}
+
+/* ─── ANIMATIONS ────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.card { animation: fadeUp 0.4s ease both; }
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.12s; }
+.card:nth-child(3) { animation-delay: 0.18s; }
+
+/* ─── INSTALL BUTTON ────────────────────────────── */
+.btn-install {
+  width: 100%;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--bg-ele);
+  color: var(--accent2);
+  border: 1px solid rgba(129,140,248,0.3);
+  border-radius: var(--radius-md);
+  margin-top: 10px;
+  display: none;
+}
+.btn-install.show { display: block; }
+
+/* ─── DIVIDER BETWEEN SAVE BADGES ──────────────── */
+.saved-indicators {
+  display: flex;
   gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="card">
-    <h1>⚡ APK Builder</h1>
-    <div class="subtitle">Upload ZIP → Build APK via GitHub Actions</div>
+<div class="page">
 
-    <!-- 2 kolom: Token & Repo Workflow (hemat space vertikal) -->
-    <div class="two-col-grid">
-      <div class="field">
-        <label>
-          GitHub Token
-          <span class="token-toggle" onclick="toggleToken()">👁 Tampilkan</span>
-        </label>
-        <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx" oninput="markUnsaved()">
-        <span class="save-badge" id="tokenSaved" style="display:none; margin-top: 4px; display: inline-block;">✓ Tersimpan</span>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">APK<span>Builder</span></div>
+    </div>
+    <button class="pwa-btn" id="installBtn" onclick="installPWA()">+ INSTALL</button>
+  </div>
+
+  <!-- STEP INDICATOR -->
+  <div class="steps">
+    <div class="step active">
+      <div class="step-dot">🔑</div>
+      <div class="step-label">Auth</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step active">
+      <div class="step-dot">📁</div>
+      <div class="step-label">Upload</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step active">
+      <div class="step-dot">🔨</div>
+      <div class="step-label">Build</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step active">
+      <div class="step-dot">📦</div>
+      <div class="step-label">Download</div>
+    </div>
+  </div>
+
+  <!-- CARD 1: AUTH -->
+  <div class="card">
+    <div class="card-label">01 — Konfigurasi</div>
+
+    <div class="field">
+      <div class="field-label">
+        <div class="field-label-left">GitHub Token</div>
+        <span class="token-toggle" onclick="toggleToken()">👁 Tampilkan</span>
       </div>
-      <div class="field">
-        <label>
-          Repo Workflow
-          <span class="save-badge" id="repoSaved" style="display:none">✓ Simpan</span>
-        </label>
-        <input type="text" id="workflowRepo" placeholder="user/apk-builder" oninput="markUnsaved()">
-      </div>
+      <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx" oninput="markUnsaved()">
     </div>
 
-    <!-- Tombol simpan/hapus -->
-    <div class="save-row">
+    <div class="field">
+      <div class="field-label">Repo Workflow</div>
+      <input type="text" id="workflowRepo" placeholder="username/apk-builder" oninput="markUnsaved()">
+    </div>
+
+    <div class="saved-indicators">
+      <span class="save-badge" id="tokenSaved">✓ Token tersimpan</span>
+      <span class="save-badge" id="repoSaved">✓ Repo tersimpan</span>
+    </div>
+
+    <div class="btn-row">
       <button class="btn-save" id="btnSave" onclick="saveSettings()">💾 Simpan</button>
       <button class="btn-clear" onclick="clearSettings()">🗑 Hapus</button>
     </div>
+  </div>
 
-    <hr class="divider">
+  <!-- CARD 2: PROJECT -->
+  <div class="card">
+    <div class="card-label">02 — Project</div>
 
-    <!-- File & App name -->
-    <div class="field field-file">
-      <label>📁 File ZIP Project</label>
-      <input type="file" id="zipFile" accept=".zip">
+    <div class="field">
+      <div class="field-label">File ZIP Project</div>
+      <div class="file-drop" id="fileDrop">
+        <input type="file" id="zipFile" accept=".zip" onchange="onFileSelect(this)">
+        <span class="file-drop-icon">📂</span>
+        <div class="file-drop-text">Tap untuk pilih file</div>
+        <div class="file-drop-hint">Format: .zip</div>
+        <div class="file-name" id="fileName"></div>
+      </div>
     </div>
 
-    <div class="field field-appname">
-      <label>🏷️ Nama App (untuk penamaan release)</label>
+    <div class="field">
+      <div class="field-label">Nama Aplikasi</div>
       <input type="text" id="appName" placeholder="contoh: my-app">
     </div>
+  </div>
 
-    <!-- Build trigger -->
-    <button class="btn-build" id="btnBuild" onclick="startBuild()">⚡ Upload & Build APK</button>
+  <!-- CARD 3: BUILD -->
+  <div class="card">
+    <div class="card-label">03 — Build & Download</div>
 
-    <div class="progress" id="progressBar">
-      <div class="progress-bar" id="progressFill"></div>
+    <button class="btn-build" id="btnBuild" onclick="startBuild()">⚡ Upload &amp; Build APK</button>
+
+    <div class="progress-wrap" id="progressBar">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-pct" id="progressPct">0%</div>
     </div>
 
     <div class="loader" id="loader">
-      <div></div><div></div><div></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
     </div>
 
-    <div class="status-box" id="status">✅ Siap membangun APK</div>
+    <div class="status-box" id="status">✅ Siap • Upload ZIP project Anda dan build APK</div>
 
     <button class="btn-download" id="btnDownload" onclick="downloadApk()" disabled>
       📦 Download APK
     </button>
 
-    <button class="btn-install" id="installBtn" onclick="installPWA()">
-      📱 Install Aplikasi
+    <button class="btn-install d-none" id="installBtnBottom" onclick="installPWA()" style="display:none">
+      📱 Install sebagai Aplikasi
     </button>
-
-    <div class="footer">APK Builder Pro • PWA Ready • No Scroll</div>
   </div>
+
+  <div class="footer">APK Builder Pro · PWA Ready · v2.0</div>
 </div>
 
 <script>
-// ───────────────────────────────────────────────────
-// STATE & PWA
-// ───────────────────────────────────────────────────
+// ── STATE ───────────────────────────────────────────
 let runId = null;
 let artifactUrl = null;
-let pollTimer = null;
 let deferredPrompt = null;
 
+// ── PWA ─────────────────────────────────────────────
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
@@ -410,10 +745,29 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   });
-  loadSettings();
 }
 
-// ── UI helpers compact ────────────────────────────
+window.addEventListener('load', () => {
+  loadSettings();
+  setStatus('✅ Siap • Upload ZIP project Anda dan build APK');
+});
+
+// ── FILE SELECT ─────────────────────────────────────
+function onFileSelect(input) {
+  const file = input.files[0];
+  const drop = document.getElementById('fileDrop');
+  const nameEl = document.getElementById('fileName');
+  if (file) {
+    drop.classList.add('has-file');
+    nameEl.style.display = 'block';
+    nameEl.textContent = '✓ ' + file.name;
+    document.querySelector('.file-drop-icon').textContent = '✅';
+    document.querySelector('.file-drop-text').textContent = 'File dipilih';
+    document.querySelector('.file-drop-hint').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+  }
+}
+
+// ── UI HELPERS ──────────────────────────────────────
 function setStatus(msg, type = '') {
   const el = document.getElementById('status');
   el.textContent = msg;
@@ -421,14 +775,18 @@ function setStatus(msg, type = '') {
 }
 
 function setProgress(pct) {
-  const bar = document.getElementById('progressBar');
+  const wrap = document.getElementById('progressBar');
   const fill = document.getElementById('progressFill');
-  bar.style.display = pct > 0 ? 'block' : 'none';
+  const pctEl = document.getElementById('progressPct');
+  wrap.style.display = pct > 0 ? 'block' : 'none';
   fill.style.width = pct + '%';
+  pctEl.textContent = pct + '%';
 }
 
 function setLoading(on) {
-  document.getElementById('loader').style.display = on ? 'flex' : 'none';
+  const loader = document.getElementById('loader');
+  if (on) loader.classList.add('active');
+  else loader.classList.remove('active');
 }
 
 function toggleToken() {
@@ -443,7 +801,7 @@ function toggleToken() {
   }
 }
 
-// ── LocalStorage Settings ──────────────────────────
+// ── LOCAL STORAGE ────────────────────────────────────
 function saveSettings() {
   const token = document.getElementById('token').value.trim();
   const repo = document.getElementById('workflowRepo').value.trim();
@@ -458,7 +816,7 @@ function saveSettings() {
     btn.textContent = '💾 Simpan';
     btn.classList.remove('saved');
   }, 1800);
-  setStatus('✅ Pengaturan disimpan aman!', 'success');
+  setStatus('✅ Pengaturan disimpan dengan aman!', 'success');
 }
 
 function clearSettings() {
@@ -482,12 +840,8 @@ function loadSettings() {
 function showSavedBadges() {
   const tokenBadge = document.getElementById('tokenSaved');
   const repoBadge = document.getElementById('repoSaved');
-  if (localStorage.getItem('apk_token')) {
-    tokenBadge.style.display = 'inline-block';
-    tokenBadge.style.marginTop = '4px';
-  } else tokenBadge.style.display = 'none';
-  if (localStorage.getItem('apk_repo')) repoBadge.style.display = 'inline-block';
-  else repoBadge.style.display = 'none';
+  tokenBadge.style.display = localStorage.getItem('apk_token') ? 'inline-block' : 'none';
+  repoBadge.style.display = localStorage.getItem('apk_repo') ? 'inline-block' : 'none';
 }
 
 function markUnsaved() {
@@ -495,7 +849,7 @@ function markUnsaved() {
   document.getElementById('repoSaved').style.display = 'none';
 }
 
-// ── Validasi Input ─────────────────────────────────
+// ── VALIDASI ─────────────────────────────────────────
 function getInputs() {
   const token = document.getElementById('token').value.trim();
   const workflowRepo = document.getElementById('workflowRepo').value.trim();
@@ -504,7 +858,7 @@ function getInputs() {
   return { token, workflowRepo, file, appName };
 }
 
-// ── Upload ZIP via GitHub Contents API ─────────────
+// ── UPLOAD ZIP ───────────────────────────────────────
 async function uploadToRelease(token, owner, repo, file, appName) {
   const tag = `build-${appName}-${Date.now()}`;
   const filePath = `uploads/${tag}.zip`;
@@ -522,7 +876,7 @@ async function uploadToRelease(token, owner, repo, file, appName) {
 
   setStatus('⬆️ Upload ZIP ke GitHub repo...', 'info');
   setProgress(30);
-  
+
   let sha = undefined;
   const checkRes = await fetch(
     `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
@@ -533,10 +887,7 @@ async function uploadToRelease(token, owner, repo, file, appName) {
     sha = existing.sha;
   }
 
-  const body = {
-    message: `Upload ${file.name} for APK build`,
-    content: base64Content
-  };
+  const body = { message: `Upload ${file.name} for APK build`, content: base64Content };
   if (sha) body.sha = sha;
 
   const uploadRes = await fetch(
@@ -561,7 +912,7 @@ async function uploadToRelease(token, owner, repo, file, appName) {
   return { zipUrl, tag };
 }
 
-// ── Trigger Workflow ───────────────────────────────
+// ── TRIGGER WORKFLOW ─────────────────────────────────
 async function triggerWorkflow(token, owner, repo, zipUrl, appName) {
   setStatus('🚀 Memicu GitHub Actions (build-apk)...', 'info');
   setProgress(55);
@@ -583,7 +934,7 @@ async function triggerWorkflow(token, owner, repo, zipUrl, appName) {
   }
 }
 
-// ── Polling Run ID ─────────────────────────────────
+// ── POLLING RUN ID ───────────────────────────────────
 async function waitForRunId(token, owner, repo) {
   setStatus('⏳ Menunggu workflow trigger...', 'info');
   setProgress(65);
@@ -601,7 +952,7 @@ async function waitForRunId(token, owner, repo) {
   throw new Error('Timeout: GitHub Actions tidak merespon dalam 100 detik');
 }
 
-// ── Tunggu Build Selesai ───────────────────────────
+// ── TUNGGU BUILD ─────────────────────────────────────
 async function waitForBuild(token, owner, repo, rid) {
   setStatus('🔨 Build berjalan (proses compile APK)...', 'info');
   setProgress(72);
@@ -612,8 +963,7 @@ async function waitForBuild(token, owner, repo, rid) {
       { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
     );
     const run = await res.json();
-    const progressMsg = `🔧 status: ${run.status || 'pending'} • ${run.conclusion ? 'selesai' : '...'}`;
-    setStatus(progressMsg, 'info');
+    setStatus(`🔧 Status: ${run.status || 'pending'} • ${run.conclusion ? 'selesai' : 'sedang proses...'}`, 'info');
     setProgress(72 + Math.min(i, 22));
     if (run.status === 'completed') {
       if (run.conclusion !== 'success') throw new Error('Build gagal: ' + run.conclusion);
@@ -623,7 +973,7 @@ async function waitForBuild(token, owner, repo, rid) {
   throw new Error('Timeout: Build melebihi 8 menit, cek log GitHub');
 }
 
-// ── Ambil URL dari apk-result.json ─────────────────
+// ── AMBIL URL ARTIFACT ───────────────────────────────
 async function getArtifactUrl(token, owner, repo, rid) {
   setStatus('📥 Mendapatkan link download APK...', 'info');
   setProgress(95);
@@ -644,7 +994,7 @@ async function getArtifactUrl(token, owner, repo, rid) {
   throw new Error('Link APK tidak ditemukan. Pastikan workflow sukses dan menghasilkan file apk-result.json');
 }
 
-// ── Main Build Flow ────────────────────────────────
+// ── MAIN BUILD FLOW ──────────────────────────────────
 async function startBuild() {
   const { token, workflowRepo, file, appName } = getInputs();
   if (!token) return setStatus('❌ Masukkan GitHub Token terlebih dahulu!', 'error');
@@ -662,15 +1012,10 @@ async function startBuild() {
   artifactUrl = null;
 
   try {
-    // 1. upload ZIP ke repo via API
     const { zipUrl } = await uploadToRelease(token, owner, repo, file, appName);
-    // 2. trigger workflow
     await triggerWorkflow(token, owner, repo, zipUrl, appName);
-    // 3. cari run id
     runId = await waitForRunId(token, owner, repo);
-    // 4. tunggu build selesai
     await waitForBuild(token, owner, repo, runId);
-    // 5. ambil artifact url
     artifactUrl = await getArtifactUrl(token, owner, repo, runId);
     setProgress(100);
     setStatus('✅ APK berhasil dibangun! Klik Download untuk menyimpan.', 'success');
@@ -684,7 +1029,7 @@ async function startBuild() {
   }
 }
 
-// ── Download APK ke perangkat ──────────────────────
+// ── DOWNLOAD APK ─────────────────────────────────────
 function downloadApk() {
   if (!artifactUrl) {
     setStatus('⚠️ Belum ada APK siap. Silakan Build terlebih dahulu.', 'error');
@@ -701,18 +1046,6 @@ function downloadApk() {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-// ensure initial UI fit: force check
-window.addEventListener('load', () => {
-  setStatus('✅ Siap • upload ZIP project dan build APK langsung');
-  // minimal delay to prevent overflow
-  setTimeout(() => {
-    if (window.innerHeight > 700) {
-      // if huge screen, no problem, but never scroll
-      document.body.style.overflow = 'hidden';
-    }
-  }, 50);
-});
 </script>
 </body>
 </html>
