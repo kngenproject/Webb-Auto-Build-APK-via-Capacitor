@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <title>APK Builder Pro</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#080d1a">
@@ -13,1039 +13,515 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg-base:    #080d1a;
-  --bg-card:    #0e1628;
-  --bg-input:   #060b17;
-  --bg-ele:     #111d35;
-  --border:     rgba(255,255,255,0.07);
-  --border-act: rgba(56,189,248,0.5);
-  --accent:     #38bdf8;
-  --accent2:    #818cf8;
-  --green:      #34d399;
-  --red:        #f87171;
-  --amber:      #fbbf24;
-  --text-pri:   #f0f6ff;
-  --text-sec:   #8b99b5;
-  --text-muted: #3d4f6e;
-  --mono:       'Space Mono', monospace;
-  --sans:       'DM Sans', system-ui, sans-serif;
-  --radius-lg:  20px;
-  --radius-md:  14px;
-  --radius-sm:  10px;
-  --radius-xs:  8px;
+  --bg:      #080d1a;
+  --card:    #0d1525;
+  --inp:     #060b17;
+  --ele:     #111d35;
+  --border:  rgba(255,255,255,0.07);
+  --bact:    rgba(56,189,248,0.45);
+  --accent:  #38bdf8;
+  --accent2: #818cf8;
+  --green:   #34d399;
+  --red:     #f87171;
+  --t1:      #f0f6ff;
+  --t2:      #8b99b5;
+  --t3:      #3d4f6e;
+  --mono:    'Space Mono', monospace;
+  --sans:    'DM Sans', system-ui, sans-serif;
+  --r:       16px;
+  --rm:      12px;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-html { height: 100%; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; }
 
 body {
   font-family: var(--sans);
-  background: var(--bg-base);
-  color: var(--text-pri);
-  min-height: 100%;
-  overflow-x: hidden;
-  /* subtle noise texture via gradient */
-  background-image:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(56,189,248,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(129,140,248,0.06) 0%, transparent 50%);
-}
-
-/* ─── SCROLLBAR ─────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
-
-/* ─── PAGE WRAPPER ──────────────────────────────── */
-.page {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: env(safe-area-inset-top, 0px) 16px env(safe-area-inset-bottom, 24px);
-  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--t1);
   display: flex;
   flex-direction: column;
+  height: 100dvh;
+  background-image: radial-gradient(ellipse 80% 50% at 50% -5%, rgba(56,189,248,0.07) 0%, transparent 55%);
 }
 
-/* ─── TOPBAR ────────────────────────────────────── */
+::-webkit-scrollbar { display:none; }
+
+/* TOPBAR */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 0 16px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: linear-gradient(to bottom, var(--bg-base) 80%, transparent);
-  padding-top: env(safe-area-inset-top, 20px);
-}
-
-.topbar-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.logo-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
+  padding: 12px 16px 8px;
+  padding-top: max(12px, env(safe-area-inset-top));
   flex-shrink: 0;
-  box-shadow: 0 0 20px rgba(56,189,248,0.3);
+}
+.logo { display:flex; align-items:center; gap:9px; }
+.logo-img {
+  width:32px; height:32px; border-radius:9px; object-fit:cover;
+  box-shadow:0 0 14px rgba(56,189,248,0.25);
+}
+.logo-fallback {
+  width:32px; height:32px; border-radius:9px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display:none; align-items:center; justify-content:center;
+  font-size:17px; box-shadow:0 0 14px rgba(56,189,248,0.25);
+}
+.logo-text { font-family:var(--mono); font-size:14px; font-weight:700; letter-spacing:-0.3px; }
+.logo-text b { color:var(--accent); }
+.pwa-chip {
+  font-family:var(--mono); font-size:9px; font-weight:700;
+  color:var(--accent); background:rgba(56,189,248,0.1);
+  border:1px solid rgba(56,189,248,0.2); border-radius:20px;
+  padding:4px 11px; cursor:pointer; display:none; letter-spacing:0.4px;
+}
+.pwa-chip.show { display:block; }
+
+/* MAIN */
+.main {
+  flex:1; overflow:hidden; padding:4px 14px 0;
+  display:flex; flex-direction:column; gap:8px;
 }
 
-.logo-text {
-  font-family: var(--mono);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  color: var(--text-pri);
-}
-
-.logo-text span {
-  color: var(--accent);
-}
-
-.pwa-btn {
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--accent);
-  background: rgba(56,189,248,0.1);
-  border: 1px solid rgba(56,189,248,0.25);
-  border-radius: 30px;
-  padding: 5px 12px;
-  cursor: pointer;
-  letter-spacing: 0.5px;
-  display: none;
-  transition: all 0.2s;
-}
-.pwa-btn.show { display: block; }
-.pwa-btn:active { transform: scale(0.96); background: rgba(56,189,248,0.2); }
-
-/* ─── SECTION CARD ──────────────────────────────── */
+/* CARD */
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  margin-bottom: 12px;
-  position: relative;
-  overflow: hidden;
+  background:var(--card); border:1px solid var(--border);
+  border-radius:var(--r); padding:12px 14px;
+  position:relative; overflow:hidden;
 }
-
 .card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
-  pointer-events: none;
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.025) 0%,transparent 60%);
+  pointer-events:none;
 }
-
-.card-label {
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.card-title {
+  font-family:var(--mono); font-size:8px; font-weight:700;
+  letter-spacing:1.4px; color:var(--t3); text-transform:uppercase;
+  margin-bottom:10px; display:flex; align-items:center; gap:7px;
 }
+.card-title::after { content:''; flex:1; height:1px; background:var(--border); }
 
-.card-label::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
+/* GRID */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+/* FIELD */
+.field { display:flex; flex-direction:column; gap:5px; }
+.flabel {
+  font-size:10px; font-weight:600; color:var(--t2);
+  display:flex; align-items:center; justify-content:space-between;
 }
-
-/* ─── FIELD ─────────────────────────────────────── */
-.field {
-  margin-bottom: 14px;
-}
-.field:last-child { margin-bottom: 0; }
-
-.field-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-sec);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  letter-spacing: 0.2px;
-}
-
-.field-label-left {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
 .token-toggle {
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--accent);
-  cursor: pointer;
-  background: rgba(56,189,248,0.1);
-  border: 1px solid rgba(56,189,248,0.2);
-  padding: 3px 10px;
-  border-radius: 20px;
-  transition: all 0.15s;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
+  font-family:var(--mono); font-size:8px; font-weight:700;
+  color:var(--accent); background:rgba(56,189,248,0.1);
+  border:1px solid rgba(56,189,248,0.2); padding:2px 9px;
+  border-radius:20px; cursor:pointer;
 }
-.token-toggle:active { background: rgba(56,189,248,0.2); }
-
 .save-badge {
-  font-family: var(--mono);
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--green);
-  background: rgba(52,211,153,0.1);
-  border: 1px solid rgba(52,211,153,0.25);
-  padding: 3px 10px;
-  border-radius: 20px;
-  display: none;
-  letter-spacing: 0.3px;
+  font-family:var(--mono); font-size:8px; font-weight:700;
+  color:var(--green); background:rgba(52,211,153,0.1);
+  border:1px solid rgba(52,211,153,0.2); padding:2px 9px;
+  border-radius:20px; display:none;
 }
 
-input[type="text"],
-input[type="password"] {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--bg-input);
-  color: var(--text-pri);
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 400;
-  outline: none;
-  transition: all 0.2s;
-  -webkit-appearance: none;
+input[type="text"], input[type="password"] {
+  width:100%; padding:9px 11px; border-radius:var(--rm);
+  border:1px solid var(--border); background:var(--inp);
+  color:var(--t1); font-family:var(--mono); font-size:11px;
+  outline:none; transition:all 0.18s; -webkit-appearance:none;
 }
+input::placeholder { color:var(--t3); }
+input:focus { border-color:var(--bact); box-shadow:0 0 0 3px rgba(56,189,248,0.08); }
 
-input[type="text"]::placeholder,
-input[type="password"]::placeholder {
-  color: var(--text-muted);
-  font-weight: 400;
+/* SAVE ROW */
+.save-row { display:flex; gap:8px; margin-top:10px; }
+
+/* BUTTONS */
+button { border:none; cursor:pointer; font-family:var(--sans); font-weight:600; transition:all 0.18s; -webkit-appearance:none; }
+button:active { transform:scale(0.96); }
+
+.btn-save { flex:1; padding:9px 0; font-size:12px; background:var(--accent); color:#071525; border-radius:30px; }
+.btn-save.saved { background:var(--green); color:#062012; }
+.btn-clear { flex:1; padding:9px 0; font-size:12px; background:var(--ele); color:var(--t2); border-radius:30px; border:1px solid var(--border); }
+
+/* FILE PICK */
+.file-pick {
+  display:flex; align-items:center; gap:10px; padding:9px 12px;
+  border-radius:var(--rm); border:1.5px dashed var(--border);
+  background:var(--inp); cursor:pointer; position:relative; transition:all 0.18s;
 }
+.file-pick.has-file { border-color:rgba(52,211,153,0.35); background:rgba(52,211,153,0.04); }
+.file-pick input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.file-icon { font-size:18px; flex-shrink:0; }
+.file-info { flex:1; overflow:hidden; }
+.file-info-title { font-size:11px; font-weight:600; color:var(--t2); }
+.file-info-sub { font-family:var(--mono); font-size:9px; color:var(--t3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.file-info-sub.ok { color:var(--green); }
 
-input:focus {
-  border-color: var(--border-act);
-  background: #070c18;
-  box-shadow: 0 0 0 3px rgba(56,189,248,0.1), inset 0 1px 3px rgba(0,0,0,0.3);
-}
-
-/* ─── FILE INPUT ────────────────────────────────── */
-.file-drop {
-  border: 1.5px dashed var(--border);
-  border-radius: var(--radius-md);
-  background: var(--bg-input);
-  padding: 18px 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  position: relative;
-  overflow: hidden;
-}
-
-.file-drop.has-file {
-  border-color: rgba(52,211,153,0.4);
-  background: rgba(52,211,153,0.04);
-}
-
-.file-drop:active { transform: scale(0.99); }
-
-.file-drop input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-}
-
-.file-drop-icon { font-size: 24px; margin-bottom: 6px; display: block; }
-
-.file-drop-text {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-sec);
-  margin-bottom: 2px;
-}
-
-.file-drop-hint {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text-muted);
-}
-
-.file-name {
-  display: none;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--green);
-  font-weight: 700;
-  word-break: break-all;
-}
-
-/* ─── BUTTONS ───────────────────────────────────── */
-.btn-row {
-  display: flex;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-button {
-  border: none;
-  cursor: pointer;
-  font-family: var(--sans);
-  font-weight: 600;
-  border-radius: 40px;
-  transition: all 0.2s;
-  -webkit-appearance: none;
-}
-button:active { transform: scale(0.97); }
-
-.btn-save {
-  flex: 1;
-  padding: 11px 0;
-  font-size: 13px;
-  background: var(--accent);
-  color: #07111f;
-  letter-spacing: 0.1px;
-}
-.btn-save:active { background: #29a8db; }
-.btn-save.saved { background: var(--green); color: #062012; }
-
-.btn-clear {
-  flex: 1;
-  padding: 11px 0;
-  font-size: 13px;
-  background: var(--bg-ele);
-  color: var(--text-sec);
-  border: 1px solid var(--border);
-}
-.btn-clear:active { background: #1a2840; }
-
+/* BUILD BTN */
 .btn-build {
-  width: 100%;
-  padding: 15px;
-  font-size: 15px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-  color: #fff;
-  border-radius: var(--radius-md);
-  letter-spacing: 0.2px;
-  box-shadow: 0 4px 24px rgba(34,197,94,0.25);
-  position: relative;
-  overflow: hidden;
+  width:100%; padding:13px; font-size:14px; font-weight:700;
+  background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff;
+  border-radius:var(--rm); box-shadow:0 4px 20px rgba(34,197,94,0.2);
 }
+.btn-build:disabled { background:#0c2014; color:#235234; box-shadow:none; transform:none; cursor:not-allowed; }
 
-.btn-build::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
-  transition: left 0.4s;
-}
+/* PROGRESS */
+.progress-wrap { display:none; margin-top:8px; }
+.progress-track { height:3px; background:var(--ele); border-radius:3px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--green),var(--accent)); border-radius:3px; width:0%; transition:width 0.4s ease; }
+.progress-row { display:flex; justify-content:space-between; margin-top:4px; }
+.progress-label { font-family:var(--mono); font-size:9px; color:var(--t3); }
 
-.btn-build:not(:disabled):active::before { left: 100%; }
+/* LOADER */
+.loader { display:none; gap:4px; justify-content:center; margin:6px 0 2px; }
+.loader.on { display:flex; }
+.dot { width:5px; height:5px; border-radius:50%; background:var(--accent); animation:pulse 1.4s ease-in-out infinite; }
+.dot:nth-child(2) { animation-delay:.2s; background:var(--accent2); }
+.dot:nth-child(3) { animation-delay:.4s; background:var(--green); }
+@keyframes pulse { 0%,80%,100%{transform:scale(0.4);opacity:0.3;} 40%{transform:scale(1);opacity:1;} }
 
-.btn-build:disabled {
-  background: #0d2a16;
-  color: #2d6e45;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-.btn-download {
-  width: 100%;
-  padding: 14px;
-  font-size: 14px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: #fff;
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 20px rgba(59,130,246,0.2);
-  margin-top: 12px;
-}
-
-.btn-download:disabled {
-  background: #0a1a38;
-  color: #2a4a80;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
-/* ─── PROGRESS ──────────────────────────────────── */
-.progress-wrap {
-  display: none;
-  margin-top: 12px;
-}
-
-.progress-track {
-  height: 4px;
-  background: var(--bg-ele);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--green), var(--accent));
-  border-radius: 4px;
-  width: 0%;
-  transition: width 0.4s ease;
-  position: relative;
-}
-
-.progress-fill::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 8px var(--accent);
-}
-
-.progress-pct {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text-muted);
-  text-align: right;
-  margin-top: 5px;
-}
-
-/* ─── LOADER DOTS ───────────────────────────────── */
-.loader {
-  display: none;
-  gap: 5px;
-  justify-content: center;
-  margin: 10px 0 4px;
-}
-
-.loader.active { display: flex; }
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: pulse 1.4s ease-in-out infinite;
-}
-.dot:nth-child(2) { animation-delay: 0.2s; background: var(--accent2); }
-.dot:nth-child(3) { animation-delay: 0.4s; background: var(--green); }
-
-@keyframes pulse {
-  0%, 80%, 100% { transform: scale(0.5); opacity: 0.3; }
-  40% { transform: scale(1.1); opacity: 1; }
-}
-
-/* ─── STATUS BOX ────────────────────────────────── */
+/* STATUS */
 .status-box {
-  margin-top: 12px;
-  padding: 12px 14px;
-  border-radius: var(--radius-md);
-  background: var(--bg-ele);
-  border: 1px solid var(--border);
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 400;
-  color: var(--text-sec);
-  word-break: break-word;
-  line-height: 1.6;
-  min-height: 44px;
-  transition: all 0.25s;
+  padding:8px 11px; border-radius:var(--rm); background:var(--ele);
+  border:1px solid var(--border); font-family:var(--mono); font-size:10px;
+  color:var(--t2); word-break:break-word; line-height:1.55; margin-top:8px; transition:all 0.2s;
 }
+.status-box.error   { color:var(--red);   background:rgba(248,113,113,0.06); border-color:rgba(248,113,113,0.18); }
+.status-box.success { color:var(--green); background:rgba(52,211,153,0.06);  border-color:rgba(52,211,153,0.18); }
+.status-box.info    { color:var(--accent);background:rgba(56,189,248,0.06);  border-color:rgba(56,189,248,0.18); }
 
-.status-box.error {
-  color: var(--red);
-  background: rgba(248,113,113,0.06);
-  border-color: rgba(248,113,113,0.2);
+/* DOWNLOAD */
+.btn-download {
+  width:100%; padding:12px; font-size:13px; font-weight:700;
+  background:linear-gradient(135deg,#3b82f6,#2563eb); color:#fff;
+  border-radius:var(--rm); box-shadow:0 4px 16px rgba(59,130,246,0.18); margin-top:8px;
 }
-.status-box.success {
-  color: var(--green);
-  background: rgba(52,211,153,0.06);
-  border-color: rgba(52,211,153,0.2);
-}
-.status-box.info {
-  color: var(--accent);
-  background: rgba(56,189,248,0.06);
-  border-color: rgba(56,189,248,0.2);
-}
+.btn-download:disabled { background:#091a38; color:#1e3a70; box-shadow:none; transform:none; cursor:not-allowed; }
 
-/* ─── FOOTER ────────────────────────────────────── */
-.footer {
-  text-align: center;
-  padding: 20px 0 10px;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: 0.5px;
-  margin-top: auto;
-}
-
-.footer span { color: var(--text-muted); }
-
-/* ─── STEP INDICATOR ────────────────────────────── */
-.steps {
-  display: flex;
-  gap: 0;
-  margin-bottom: 20px;
-  align-items: center;
-}
-
-.step {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  position: relative;
-}
-
-.step-dot {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--bg-ele);
-  border: 1.5px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  z-index: 1;
-  position: relative;
-}
-
-.step.active .step-dot {
-  background: rgba(56,189,248,0.15);
-  border-color: var(--accent);
-  color: var(--accent);
-  box-shadow: 0 0 12px rgba(56,189,248,0.2);
-}
-
-.step-label {
-  font-size: 9px;
-  color: var(--text-muted);
-  font-weight: 600;
-  text-align: center;
-  line-height: 1.3;
-}
-
-.step.active .step-label { color: var(--accent); }
-
-.step-line {
-  height: 1.5px;
-  background: var(--border);
-  flex: 1;
-  margin: 0 -2px;
-  position: relative;
-  top: -10px;
-  z-index: 0;
-}
-
-/* ─── ANIMATIONS ────────────────────────────────── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.card { animation: fadeUp 0.4s ease both; }
-.card:nth-child(1) { animation-delay: 0.05s; }
-.card:nth-child(2) { animation-delay: 0.12s; }
-.card:nth-child(3) { animation-delay: 0.18s; }
-
-/* ─── INSTALL BUTTON ────────────────────────────── */
 .btn-install {
-  width: 100%;
-  padding: 12px;
-  font-size: 13px;
-  font-weight: 600;
-  background: var(--bg-ele);
-  color: var(--accent2);
-  border: 1px solid rgba(129,140,248,0.3);
-  border-radius: var(--radius-md);
-  margin-top: 10px;
-  display: none;
+  width:100%; padding:10px; font-size:12px; background:var(--ele);
+  color:var(--accent2); border:1px solid rgba(129,140,248,0.25);
+  border-radius:var(--rm); margin-top:7px; display:none;
 }
-.btn-install.show { display: block; }
+.btn-install.show { display:block; }
 
-/* ─── DIVIDER BETWEEN SAVE BADGES ──────────────── */
-.saved-indicators {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 8px;
+/* FOOTER */
+.footer {
+  flex-shrink:0; text-align:center; font-family:var(--mono);
+  font-size:9px; color:var(--t3); padding:6px 0;
+  padding-bottom:max(6px, env(safe-area-inset-bottom)); letter-spacing:0.4px;
 }
 </style>
 </head>
 <body>
 
-<div class="page">
-
-  <!-- TOPBAR -->
-  <div class="topbar">
-    <div class="topbar-logo">
-      <img src="icon/icon-192.png" class="logo-icon" style="width:36px;height:36px;border-radius:10px;object-fit:cover;display:block;">
-      <div class="logo-text">APK<span>Builder</span></div>
-    </div>
-    <button class="pwa-btn" id="installBtn" onclick="installPWA()">+ INSTALL</button>
+<div class="topbar">
+  <div class="logo">
+    <img src="icon/icon-192.png" class="logo-img"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="logo-fallback">⚡</div>
+    <div class="logo-text">APK<b>Builder</b></div>
   </div>
+  <button class="pwa-chip" id="installBtn" onclick="installPWA()">+ INSTALL</button>
+</div>
 
-  <!-- STEP INDICATOR -->
-  <div class="steps">
-    <div class="step active">
-      <div class="step-dot">🔑</div>
-      <div class="step-label">Auth</div>
-    </div>
-    <div class="step-line"></div>
-    <div class="step active">
-      <div class="step-dot">📁</div>
-      <div class="step-label">Upload</div>
-    </div>
-    <div class="step-line"></div>
-    <div class="step active">
-      <div class="step-dot">🔨</div>
-      <div class="step-label">Build</div>
-    </div>
-    <div class="step-line"></div>
-    <div class="step active">
-      <div class="step-dot">📦</div>
-      <div class="step-label">Download</div>
-    </div>
-  </div>
+<div class="main">
 
-  <!-- CARD 1: AUTH -->
+  <!-- 01 KONFIGURASI -->
   <div class="card">
-    <div class="card-label">01 — Konfigurasi</div>
-
-    <div class="field">
-      <div class="field-label">
-        <div class="field-label-left">GitHub Token</div>
-        <span class="token-toggle" onclick="toggleToken()">👁 Tampilkan</span>
+    <div class="card-title">01 — Konfigurasi</div>
+    <div class="two-col">
+      <div class="field">
+        <div class="flabel">
+          Token
+          <span class="token-toggle" onclick="toggleToken()">👁 Lihat</span>
+        </div>
+        <input type="password" id="token" placeholder="ghp_xxx..." oninput="markUnsaved()">
+        <span class="save-badge" id="tokenSaved">✓ Tersimpan</span>
       </div>
-      <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx" oninput="markUnsaved()">
+      <div class="field">
+        <div class="flabel">
+          Repo
+          <span class="save-badge" id="repoSaved">✓ Simpan</span>
+        </div>
+        <input type="text" id="workflowRepo" placeholder="user/repo" oninput="markUnsaved()">
+      </div>
     </div>
-
-    <div class="field">
-      <div class="field-label">Repo Workflow</div>
-      <input type="text" id="workflowRepo" placeholder="username/apk-builder" oninput="markUnsaved()">
-    </div>
-
-    <div class="saved-indicators">
-      <span class="save-badge" id="tokenSaved">✓ Token tersimpan</span>
-      <span class="save-badge" id="repoSaved">✓ Repo tersimpan</span>
-    </div>
-
-    <div class="btn-row">
+    <div class="save-row">
       <button class="btn-save" id="btnSave" onclick="saveSettings()">💾 Simpan</button>
       <button class="btn-clear" onclick="clearSettings()">🗑 Hapus</button>
     </div>
   </div>
 
-  <!-- CARD 2: PROJECT -->
+  <!-- 02 PROJECT -->
   <div class="card">
-    <div class="card-label">02 — Project</div>
-
+    <div class="card-title">02 — Project</div>
     <div class="field">
-      <div class="field-label">File ZIP Project</div>
-      <div class="file-drop" id="fileDrop">
+      <div class="flabel">File ZIP</div>
+      <div class="file-pick" id="filePick">
         <input type="file" id="zipFile" accept=".zip" onchange="onFileSelect(this)">
-        <span class="file-drop-icon">📂</span>
-        <div class="file-drop-text">Tap untuk pilih file</div>
-        <div class="file-drop-hint">Format: .zip</div>
-        <div class="file-name" id="fileName"></div>
+        <div class="file-icon" id="fileIcon">📂</div>
+        <div class="file-info">
+          <div class="file-info-title" id="fileTitle">Pilih file ZIP project</div>
+          <div class="file-info-sub" id="fileSub">Tap untuk browse</div>
+        </div>
       </div>
     </div>
-
-    <div class="field">
-      <div class="field-label">Nama Aplikasi</div>
-      <input type="text" id="appName" placeholder="contoh: my-app">
+    <div class="field" style="margin-top:8px">
+      <div class="flabel">Nama App</div>
+      <input type="text" id="appName" placeholder="my-app">
     </div>
   </div>
 
-  <!-- CARD 3: BUILD -->
+  <!-- 03 BUILD -->
   <div class="card">
-    <div class="card-label">03 — Build & Download</div>
-
+    <div class="card-title">03 — Build</div>
     <button class="btn-build" id="btnBuild" onclick="startBuild()">⚡ Upload &amp; Build APK</button>
-
     <div class="progress-wrap" id="progressBar">
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-row">
+        <span class="progress-label" id="progressPct">0%</span>
+        <span class="progress-label">GitHub Actions</span>
       </div>
-      <div class="progress-pct" id="progressPct">0%</div>
     </div>
-
     <div class="loader" id="loader">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
-
-    <div class="status-box" id="status">✅ Siap • Upload ZIP project Anda dan build APK</div>
-
-    <button class="btn-download" id="btnDownload" onclick="downloadApk()" disabled>
-      📦 Download APK
-    </button>
-
-    <button class="btn-install d-none" id="installBtnBottom" onclick="installPWA()" style="display:none">
-      📱 Install sebagai Aplikasi
-    </button>
+    <div class="status-box" id="status">✅ Siap membangun APK</div>
+    <button class="btn-download" id="btnDownload" onclick="downloadApk()" disabled>📦 Download APK</button>
+    <button class="btn-install" id="installBtnBottom" onclick="installPWA()">📱 Install Aplikasi</button>
   </div>
 
-  <div class="footer">APK Builder Pro · PWA Ready · v2.0</div>
 </div>
 
+<div class="footer">APK Builder Pro · PWA · v2.0</div>
+
 <script>
-// ── STATE ───────────────────────────────────────────
-let runId = null;
-let artifactUrl = null;
-let deferredPrompt = null;
+let runId=null,artifactUrl=null,deferredPrompt=null;
 
-// ── PWA ─────────────────────────────────────────────
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault(); deferredPrompt=e;
   document.getElementById('installBtn').classList.add('show');
+  document.getElementById('installBtnBottom').classList.add('show');
 });
 
-function installPWA() {
-  if (!deferredPrompt) return;
+function installPWA(){
+  if(!deferredPrompt)return;
   deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(() => {
-    deferredPrompt = null;
+  deferredPrompt.userChoice.then(()=>{
+    deferredPrompt=null;
     document.getElementById('installBtn').classList.remove('show');
+    document.getElementById('installBtnBottom').classList.remove('show');
   });
 }
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  });
+if('serviceWorker' in navigator)
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+window.addEventListener('load',()=>{ loadSettings(); setStatus('✅ Siap membangun APK'); });
+
+function onFileSelect(input){
+  const file=input.files[0]; if(!file)return;
+  document.getElementById('filePick').classList.add('has-file');
+  document.getElementById('fileIcon').textContent='✅';
+  const name=file.name; document.getElementById('fileTitle').textContent=name.length>22?name.substring(0,22)+'…':name;
+  const sub=document.getElementById('fileSub');
+  sub.textContent=(file.size/1024/1024).toFixed(2)+' MB'; sub.classList.add('ok');
 }
 
-window.addEventListener('load', () => {
-  loadSettings();
-  setStatus('✅ Siap • Upload ZIP project Anda dan build APK');
-});
-
-// ── FILE SELECT ─────────────────────────────────────
-function onFileSelect(input) {
-  const file = input.files[0];
-  const drop = document.getElementById('fileDrop');
-  const nameEl = document.getElementById('fileName');
-  if (file) {
-    drop.classList.add('has-file');
-    nameEl.style.display = 'block';
-    nameEl.textContent = '✓ ' + file.name;
-    document.querySelector('.file-drop-icon').textContent = '✅';
-    document.querySelector('.file-drop-text').textContent = 'File dipilih';
-    document.querySelector('.file-drop-hint').textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
-  }
+function setStatus(msg,type=''){
+  const el=document.getElementById('status');
+  el.textContent=msg; el.className='status-box'+(type?' '+type:'');
 }
 
-// ── UI HELPERS ──────────────────────────────────────
-function setStatus(msg, type = '') {
-  const el = document.getElementById('status');
-  el.textContent = msg;
-  el.className = 'status-box' + (type ? ' ' + type : '');
+function setProgress(pct){
+  const wrap=document.getElementById('progressBar');
+  wrap.style.display=pct>0?'block':'none';
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressPct').textContent=pct+'%';
 }
 
-function setProgress(pct) {
-  const wrap = document.getElementById('progressBar');
-  const fill = document.getElementById('progressFill');
-  const pctEl = document.getElementById('progressPct');
-  wrap.style.display = pct > 0 ? 'block' : 'none';
-  fill.style.width = pct + '%';
-  pctEl.textContent = pct + '%';
+function setLoading(on){
+  const l=document.getElementById('loader');
+  on?l.classList.add('on'):l.classList.remove('on');
 }
 
-function setLoading(on) {
-  const loader = document.getElementById('loader');
-  if (on) loader.classList.add('active');
-  else loader.classList.remove('active');
+function toggleToken(){
+  const el=document.getElementById('token'),t=document.querySelector('.token-toggle');
+  if(el.type==='password'){el.type='text';t.textContent='🙈 Tutup';}
+  else{el.type='password';t.textContent='👁 Lihat';}
 }
 
-function toggleToken() {
-  const el = document.getElementById('token');
-  const toggle = document.querySelector('.token-toggle');
-  if (el.type === 'password') {
-    el.type = 'text';
-    toggle.textContent = '🙈 Sembunyi';
-  } else {
-    el.type = 'password';
-    toggle.textContent = '👁 Tampilkan';
-  }
-}
-
-// ── LOCAL STORAGE ────────────────────────────────────
-function saveSettings() {
-  const token = document.getElementById('token').value.trim();
-  const repo = document.getElementById('workflowRepo').value.trim();
-  if (!token && !repo) return setStatus('⚠️ Token dan repo kosong, tidak ada yang disimpan.', 'error');
-  if (token) localStorage.setItem('apk_token', token);
-  if (repo) localStorage.setItem('apk_repo', repo);
+function saveSettings(){
+  const token=document.getElementById('token').value.trim();
+  const repo=document.getElementById('workflowRepo').value.trim();
+  if(!token&&!repo)return setStatus('⚠️ Token dan repo kosong.','error');
+  if(token)localStorage.setItem('apk_token',token);
+  if(repo)localStorage.setItem('apk_repo',repo);
   showSavedBadges();
-  const btn = document.getElementById('btnSave');
-  btn.textContent = '✅ Tersimpan!';
-  btn.classList.add('saved');
-  setTimeout(() => {
-    btn.textContent = '💾 Simpan';
-    btn.classList.remove('saved');
-  }, 1800);
-  setStatus('✅ Pengaturan disimpan dengan aman!', 'success');
+  const btn=document.getElementById('btnSave');
+  btn.textContent='✅ Tersimpan!'; btn.classList.add('saved');
+  setTimeout(()=>{btn.textContent='💾 Simpan';btn.classList.remove('saved');},1800);
+  setStatus('✅ Pengaturan disimpan!','success');
 }
 
-function clearSettings() {
-  localStorage.removeItem('apk_token');
-  localStorage.removeItem('apk_repo');
-  document.getElementById('token').value = '';
-  document.getElementById('workflowRepo').value = '';
-  document.getElementById('tokenSaved').style.display = 'none';
-  document.getElementById('repoSaved').style.display = 'none';
-  setStatus('🗑 Pengaturan lokal dihapus.', 'info');
+function clearSettings(){
+  localStorage.removeItem('apk_token'); localStorage.removeItem('apk_repo');
+  document.getElementById('token').value='';
+  document.getElementById('workflowRepo').value='';
+  document.getElementById('tokenSaved').style.display='none';
+  document.getElementById('repoSaved').style.display='none';
+  setStatus('🗑 Pengaturan dihapus.','info');
 }
 
-function loadSettings() {
-  const token = localStorage.getItem('apk_token');
-  const repo = localStorage.getItem('apk_repo');
-  if (token) document.getElementById('token').value = token;
-  if (repo) document.getElementById('workflowRepo').value = repo;
-  if (token || repo) showSavedBadges();
+function loadSettings(){
+  const token=localStorage.getItem('apk_token');
+  const repo=localStorage.getItem('apk_repo');
+  if(token)document.getElementById('token').value=token;
+  if(repo)document.getElementById('workflowRepo').value=repo;
+  if(token||repo)showSavedBadges();
 }
 
-function showSavedBadges() {
-  const tokenBadge = document.getElementById('tokenSaved');
-  const repoBadge = document.getElementById('repoSaved');
-  tokenBadge.style.display = localStorage.getItem('apk_token') ? 'inline-block' : 'none';
-  repoBadge.style.display = localStorage.getItem('apk_repo') ? 'inline-block' : 'none';
+function showSavedBadges(){
+  document.getElementById('tokenSaved').style.display=localStorage.getItem('apk_token')?'inline-block':'none';
+  document.getElementById('repoSaved').style.display=localStorage.getItem('apk_repo')?'inline-block':'none';
 }
 
-function markUnsaved() {
-  document.getElementById('tokenSaved').style.display = 'none';
-  document.getElementById('repoSaved').style.display = 'none';
+function markUnsaved(){
+  document.getElementById('tokenSaved').style.display='none';
+  document.getElementById('repoSaved').style.display='none';
 }
 
-// ── VALIDASI ─────────────────────────────────────────
-function getInputs() {
-  const token = document.getElementById('token').value.trim();
-  const workflowRepo = document.getElementById('workflowRepo').value.trim();
-  const file = document.getElementById('zipFile').files[0];
-  const appName = document.getElementById('appName').value.trim() || 'my-app';
-  return { token, workflowRepo, file, appName };
+function getInputs(){
+  return{
+    token:document.getElementById('token').value.trim(),
+    workflowRepo:document.getElementById('workflowRepo').value.trim(),
+    file:document.getElementById('zipFile').files[0],
+    appName:document.getElementById('appName').value.trim()||'my-app'
+  };
 }
 
-// ── UPLOAD ZIP ───────────────────────────────────────
-async function uploadToRelease(token, owner, repo, file, appName) {
-  const tag = `build-${appName}-${Date.now()}`;
-  const filePath = `uploads/${tag}.zip`;
-
-  setStatus('📦 Mengompresi & encode ZIP...', 'info');
-  setProgress(15);
-  const arrayBuffer = await file.arrayBuffer();
-  const bytes = new Uint8Array(arrayBuffer);
-  let binary = '';
-  const chunk = 8192;
-  for (let i = 0; i < bytes.length; i += chunk) {
-    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
-  }
-  const base64Content = btoa(binary);
-
-  setStatus('⬆️ Upload ZIP ke GitHub repo...', 'info');
-  setProgress(30);
-
-  let sha = undefined;
-  const checkRes = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
-    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
-  );
-  if (checkRes.ok) {
-    const existing = await checkRes.json();
-    sha = existing.sha;
-  }
-
-  const body = { message: `Upload ${file.name} for APK build`, content: base64Content };
-  if (sha) body.sha = sha;
-
-  const uploadRes = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
-    {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    }
-  );
-  if (!uploadRes.ok) {
-    const err = await uploadRes.json().catch(() => ({}));
-    throw new Error('Gagal upload ZIP: ' + (err.message || uploadRes.status));
-  }
-  const asset = await uploadRes.json();
-  const zipUrl = asset.content.download_url;
-  setProgress(48);
-  return { zipUrl, tag };
-}
-
-// ── TRIGGER WORKFLOW ─────────────────────────────────
-async function triggerWorkflow(token, owner, repo, zipUrl, appName) {
-  setStatus('🚀 Memicu GitHub Actions (build-apk)...', 'info');
-  setProgress(55);
-  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/dispatches`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: 'application/vnd.github+json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      event_type: 'build-apk',
-      client_payload: { zip_url: zipUrl, app_name: appName }
-    })
+async function uploadToRelease(token,owner,repo,file,appName){
+  const tag=`build-${appName}-${Date.now()}`;
+  const filePath=`uploads/${tag}.zip`;
+  setStatus('📦 Encoding ZIP...','info'); setProgress(15);
+  const arrayBuffer=await file.arrayBuffer();
+  const bytes=new Uint8Array(arrayBuffer);
+  let binary=''; const chunk=8192;
+  for(let i=0;i<bytes.length;i+=chunk)binary+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+  const base64Content=btoa(binary);
+  setStatus('⬆️ Upload ke GitHub...','info'); setProgress(30);
+  let sha;
+  const checkRes=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,
+    {headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json'}});
+  if(checkRes.ok)sha=(await checkRes.json()).sha;
+  const body={message:`Upload ${file.name}`,content:base64Content};
+  if(sha)body.sha=sha;
+  const uploadRes=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`,{
+    method:'PUT',
+    headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},
+    body:JSON.stringify(body)
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error('Gagal trigger workflow: ' + (err.message || res.status));
-  }
+  if(!uploadRes.ok){const err=await uploadRes.json().catch(()=>({}));throw new Error('Upload gagal: '+(err.message||uploadRes.status));}
+  const asset=await uploadRes.json();
+  setProgress(48);
+  return{zipUrl:asset.content.download_url};
 }
 
-// ── POLLING RUN ID ───────────────────────────────────
-async function waitForRunId(token, owner, repo) {
-  setStatus('⏳ Menunggu workflow trigger...', 'info');
-  setProgress(65);
-  for (let i = 0; i < 22; i++) {
+async function triggerWorkflow(token,owner,repo,zipUrl,appName){
+  setStatus('🚀 Memicu GitHub Actions...','info'); setProgress(55);
+  const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/dispatches`,{
+    method:'POST',
+    headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},
+    body:JSON.stringify({event_type:'build-apk',client_payload:{zip_url:zipUrl,app_name:appName}})
+  });
+  if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error('Trigger gagal: '+(err.message||res.status));}
+}
+
+async function waitForRunId(token,owner,repo){
+  setStatus('⏳ Menunggu workflow...','info'); setProgress(65);
+  for(let i=0;i<22;i++){
     await sleep(4500);
-    const res = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/actions/runs?event=repository_dispatch&per_page=1`,
-      { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
-    );
-    const data = await res.json();
-    if (data.workflow_runs && data.workflow_runs.length > 0) {
-      return data.workflow_runs[0].id;
-    }
+    const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/runs?event=repository_dispatch&per_page=1`,
+      {headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json'}});
+    const data=await res.json();
+    if(data.workflow_runs?.length>0)return data.workflow_runs[0].id;
   }
-  throw new Error('Timeout: GitHub Actions tidak merespon dalam 100 detik');
+  throw new Error('Timeout: Actions tidak merespon (100s)');
 }
 
-// ── TUNGGU BUILD ─────────────────────────────────────
-async function waitForBuild(token, owner, repo, rid) {
-  setStatus('🔨 Build berjalan (proses compile APK)...', 'info');
-  setProgress(72);
-  for (let i = 0; i < 55; i++) {
+async function waitForBuild(token,owner,repo,rid){
+  setStatus('🔨 Compile APK...','info'); setProgress(72);
+  for(let i=0;i<55;i++){
     await sleep(9000);
-    const res = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/actions/runs/${rid}`,
-      { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
-    );
-    const run = await res.json();
-    setStatus(`🔧 Status: ${run.status || 'pending'} • ${run.conclusion ? 'selesai' : 'sedang proses...'}`, 'info');
-    setProgress(72 + Math.min(i, 22));
-    if (run.status === 'completed') {
-      if (run.conclusion !== 'success') throw new Error('Build gagal: ' + run.conclusion);
+    const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/actions/runs/${rid}`,
+      {headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json'}});
+    const run=await res.json();
+    setStatus(`🔧 ${run.status||'pending'} ${run.conclusion?'· '+run.conclusion:'· building...'}`, 'info');
+    setProgress(72+Math.min(i,22));
+    if(run.status==='completed'){
+      if(run.conclusion!=='success')throw new Error('Build gagal: '+run.conclusion);
       return true;
     }
   }
-  throw new Error('Timeout: Build melebihi 8 menit, cek log GitHub');
+  throw new Error('Timeout: Build > 8 menit');
 }
 
-// ── AMBIL URL ARTIFACT ───────────────────────────────
-async function getArtifactUrl(token, owner, repo, rid) {
-  setStatus('📥 Mendapatkan link download APK...', 'info');
-  setProgress(95);
-  for (let i = 0; i < 12; i++) {
+async function getArtifactUrl(token,owner,repo,rid){
+  setStatus('📥 Ambil link download...','info'); setProgress(95);
+  for(let i=0;i<12;i++){
     await sleep(4000);
-    const res = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/contents/apk-result.json`,
-      { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }, cache: 'no-store' }
-    );
-    if (!res.ok) continue;
-    const data = await res.json();
-    const decoded = atob(data.content.replace(/\n/g, ''));
-    const content = JSON.parse(decoded);
-    if (String(content.run_id) === String(rid) && content.url) {
-      return content.url;
-    }
+    const res=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/apk-result.json`,
+      {headers:{Authorization:`Bearer ${token}`,Accept:'application/vnd.github+json'},cache:'no-store'});
+    if(!res.ok)continue;
+    const data=await res.json();
+    const content=JSON.parse(atob(data.content.replace(/\n/g,'')));
+    if(String(content.run_id)===String(rid)&&content.url)return content.url;
   }
-  throw new Error('Link APK tidak ditemukan. Pastikan workflow sukses dan menghasilkan file apk-result.json');
+  throw new Error('Link APK tidak ditemukan');
 }
 
-// ── MAIN BUILD FLOW ──────────────────────────────────
-async function startBuild() {
-  const { token, workflowRepo, file, appName } = getInputs();
-  if (!token) return setStatus('❌ Masukkan GitHub Token terlebih dahulu!', 'error');
-  if (!workflowRepo || !workflowRepo.includes('/')) return setStatus('❌ Format repo harus "username/repo"', 'error');
-  if (!file) return setStatus('❌ Pilih file project ZIP!', 'error');
-
-  const [owner, repo] = workflowRepo.split('/');
-  const buildBtn = document.getElementById('btnBuild');
-  const downloadBtn = document.getElementById('btnDownload');
-  buildBtn.disabled = true;
-  downloadBtn.disabled = true;
-  setLoading(true);
-  setProgress(8);
-  runId = null;
-  artifactUrl = null;
-
-  try {
-    const { zipUrl } = await uploadToRelease(token, owner, repo, file, appName);
-    await triggerWorkflow(token, owner, repo, zipUrl, appName);
-    runId = await waitForRunId(token, owner, repo);
-    await waitForBuild(token, owner, repo, runId);
-    artifactUrl = await getArtifactUrl(token, owner, repo, runId);
+async function startBuild(){
+  const{token,workflowRepo,file,appName}=getInputs();
+  if(!token)return setStatus('❌ Masukkan GitHub Token!','error');
+  if(!workflowRepo||!workflowRepo.includes('/'))return setStatus('❌ Format: "username/repo"','error');
+  if(!file)return setStatus('❌ Pilih file ZIP project!','error');
+  const[owner,repo]=workflowRepo.split('/');
+  const buildBtn=document.getElementById('btnBuild');
+  const downloadBtn=document.getElementById('btnDownload');
+  buildBtn.disabled=true; downloadBtn.disabled=true;
+  setLoading(true); setProgress(8);
+  runId=null; artifactUrl=null;
+  try{
+    const{zipUrl}=await uploadToRelease(token,owner,repo,file,appName);
+    await triggerWorkflow(token,owner,repo,zipUrl,appName);
+    runId=await waitForRunId(token,owner,repo);
+    await waitForBuild(token,owner,repo,runId);
+    artifactUrl=await getArtifactUrl(token,owner,repo,runId);
     setProgress(100);
-    setStatus('✅ APK berhasil dibangun! Klik Download untuk menyimpan.', 'success');
-    downloadBtn.disabled = false;
-  } catch (err) {
-    setStatus(`❌ Gagal: ${err.message}`, 'error');
+    setStatus('✅ APK siap! Klik Download.','success');
+    downloadBtn.disabled=false;
+  }catch(err){
+    setStatus('❌ '+err.message,'error');
     setProgress(0);
-  } finally {
+  }finally{
     setLoading(false);
-    buildBtn.disabled = false;
+    buildBtn.disabled=false;
   }
 }
 
-// ── DOWNLOAD APK ─────────────────────────────────────
-function downloadApk() {
-  if (!artifactUrl) {
-    setStatus('⚠️ Belum ada APK siap. Silakan Build terlebih dahulu.', 'error');
-    return;
-  }
-  const a = document.createElement('a');
-  a.href = artifactUrl;
-  a.download = '';
-  a.target = '_blank';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setStatus('📲 Download dimulai! File APK akan tersimpan di HP.', 'success');
+function downloadApk(){
+  if(!artifactUrl)return setStatus('⚠️ Build dulu sebelum download.','error');
+  const a=document.createElement('a');
+  a.href=artifactUrl; a.download=''; a.target='_blank';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setStatus('📲 Download dimulai!','success');
 }
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 </script>
 </body>
 </html>
