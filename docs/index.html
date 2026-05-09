@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>APK Builder Pro</title>
-
-<!-- PWA Meta Tags -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,13 +11,8 @@
 <meta name="apple-mobile-web-app-title" content="APK Builder">
 <link rel="apple-touch-icon" href="icon/icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon/icon-512.png">
-
 <style>
-* {
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
+* { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 body {
   margin: 0;
   background: linear-gradient(135deg, #0f172a, #020617);
@@ -28,7 +21,7 @@ body {
 }
 .container {
   max-width: 500px;
-  margin: 50px auto;
+  margin: 40px auto;
   padding: 20px;
 }
 .card {
@@ -38,63 +31,87 @@ body {
   padding: 25px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
-h1 {
-  text-align: center;
-  margin-bottom: 5px;
-}
+h1 { text-align: center; margin-bottom: 5px; font-size: 24px; }
 .subtitle {
   text-align: center;
-  font-size: 14px;
+  font-size: 13px;
   color: #94a3b8;
   margin-bottom: 20px;
 }
-input {
+.field { margin-top: 12px; }
+.field label {
+  font-size: 12px;
+  color: #94a3b8;
+  display: block;
+  margin-bottom: 5px;
+}
+input[type="text"], input[type="password"] {
   width: 100%;
-  padding: 12px;
-  margin-top: 10px;
+  padding: 11px 14px;
   border-radius: 10px;
-  border: none;
+  border: 1px solid #1e293b;
   background: #020617;
   color: white;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+}
+input:focus { border-color: #3b82f6; }
+input[type="file"] {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: #94a3b8;
+  font-size: 13px;
+  cursor: pointer;
 }
 button {
   width: 100%;
-  padding: 12px;
-  margin-top: 15px;
+  padding: 13px;
+  margin-top: 12px;
   border-radius: 10px;
   border: none;
   font-weight: bold;
+  font-size: 15px;
   cursor: pointer;
   transition: 0.2s;
 }
-.upload {
-  background: #22c55e;
-  color: black;
+button:active { transform: scale(0.98); }
+.btn-build { background: #22c55e; color: black; }
+.btn-build:hover { background: #16a34a; }
+.btn-build:disabled { background: #166534; color: #4ade80; cursor: not-allowed; transform: none; }
+.btn-download { background: #3b82f6; color: white; }
+.btn-download:hover { background: #2563eb; }
+.btn-download:disabled { background: #1e3a5f; color: #60a5fa; cursor: not-allowed; transform: none; }
+.btn-install { background: #8b5cf6; color: white; display: none; }
+.btn-install.show { display: block; }
+.divider {
+  border: none;
+  border-top: 1px solid #1e293b;
+  margin: 18px 0;
 }
-.upload:hover {
-  background: #16a34a;
-}
-.download {
-  background: #3b82f6;
-}
-.download:hover {
-  background: #2563eb;
-}
-.status {
-  margin-top: 15px;
-  padding: 10px;
+.status-box {
+  margin-top: 14px;
+  padding: 12px 14px;
   border-radius: 10px;
   background: #020617;
   font-size: 13px;
+  color: #94a3b8;
+  min-height: 44px;
+  line-height: 1.6;
 }
+.status-box.error { color: #f87171; }
+.status-box.success { color: #4ade80; }
+.status-box.info { color: #60a5fa; }
 .loader {
   display: none;
-  margin-top: 10px;
   text-align: center;
+  margin-top: 10px;
 }
 .loader div {
-  width: 10px;
-  height: 10px;
+  width: 9px; height: 9px;
   margin: 3px;
   background: #22c55e;
   border-radius: 50%;
@@ -107,19 +124,33 @@ button {
   0%, 80%, 100% { transform: scale(0); }
   40% { transform: scale(1); }
 }
+.progress {
+  display: none;
+  margin-top: 10px;
+  background: #1e293b;
+  border-radius: 999px;
+  height: 6px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #3b82f6);
+  border-radius: 999px;
+  transition: width 0.3s;
+  width: 0%;
+}
 .footer {
   text-align: center;
   font-size: 12px;
-  color: #64748b;
+  color: #475569;
   margin-top: 20px;
 }
-.install-btn {
-  background: #8b5cf6;
-  margin-top: 10px;
-  display: none;
-}
-.install-btn.show {
-  display: block;
+.token-toggle {
+  font-size: 11px;
+  color: #3b82f6;
+  cursor: pointer;
+  float: right;
+  margin-top: -2px;
 }
 </style>
 </head>
@@ -129,98 +160,312 @@ button {
   <div class="card">
     <h1>🚀 APK Builder</h1>
     <div class="subtitle">Upload project ZIP → Build APK via GitHub Actions</div>
-    
-    <input type="file" id="zipFile" accept=".zip">
-    <input type="text" id="repo" placeholder="username/repo (target APK)">
-    
-    <button class="upload" onclick="upload()">Upload & Build</button>
-    <button class="download" onclick="getApk()">Download APK</button>
-    
-    <button id="installBtn" class="install-btn" onclick="installPWA()">📱 Install Aplikasi</button>
-    
+
+    <div class="field">
+      <label>
+        GitHub Token
+        <span class="token-toggle" onclick="toggleToken()">👁 Tampilkan</span>
+      </label>
+      <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxx">
+    </div>
+
+    <div class="field">
+      <label>Owner/Repo Workflow (tempat build.yml)</label>
+      <input type="text" id="workflowRepo" placeholder="username/apk-builder-workflow">
+    </div>
+
+    <hr class="divider">
+
+    <div class="field">
+      <label>File ZIP Project</label>
+      <input type="file" id="zipFile" accept=".zip">
+    </div>
+
+    <div class="field">
+      <label>Nama App (untuk penamaan release)</label>
+      <input type="text" id="appName" placeholder="contoh: my-app">
+    </div>
+
+    <button class="btn-build" id="btnBuild" onclick="startBuild()">⚡ Upload & Build APK</button>
+
+    <div class="progress" id="progressBar">
+      <div class="progress-bar" id="progressFill"></div>
+    </div>
+
     <div class="loader" id="loader">
       <div></div><div></div><div></div>
     </div>
-    <div class="status" id="status">Status: idle</div>
+
+    <div class="status-box" id="status">Status: siap</div>
+
+    <button class="btn-download" id="btnDownload" onclick="downloadApk()" disabled>
+      📦 Download APK
+    </button>
+
+    <button class="btn-install" id="installBtn" onclick="installPWA()">
+      📱 Install Aplikasi
+    </button>
   </div>
-  <div class="footer">APK Builder Pro • PWA Ready ⚡</div>
+  <div class="footer">APK Builder Pro • PWA Ready ⚡ • No Backend Needed</div>
 </div>
 
 <script>
-// Konfigurasi backend (ganti dengan URL backend Anda jika deploy)
-const BACKEND_URL = 'http://localhost:3000';
+// ── State ──────────────────────────────────────────
+let runId = null;
+let artifactUrl = null;
+let pollTimer = null;
+let deferredPrompt = null;
 
-// PWA Installation
-let deferredPrompt;
+// ── PWA ────────────────────────────────────────────
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
   document.getElementById('installBtn').classList.add('show');
 });
-
 function installPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((result) => {
-      if (result.outcome === 'accepted') {
-        console.log('PWA installed');
-      }
-      deferredPrompt = null;
-      document.getElementById('installBtn').classList.remove('show');
-    });
-  }
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    document.getElementById('installBtn').classList.remove('show');
+  });
 }
-
-// Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(reg => {
-      console.log('Service Worker registered', reg);
-    }).catch(err => {
-      console.log('SW registration failed', err);
-    });
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 }
 
-// Upload function
-async function upload() {
-  const file = document.getElementById('zipFile').files[0];
-  const repo = document.getElementById('repo').value;
-  if (!file || !repo) {
-    alert("Isi semua field dulu!");
-    return;
+// ── UI Helpers ─────────────────────────────────────
+function setStatus(msg, type = '') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status-box' + (type ? ' ' + type : '');
+}
+function setProgress(pct) {
+  const bar = document.getElementById('progressBar');
+  const fill = document.getElementById('progressFill');
+  bar.style.display = pct > 0 ? 'block' : 'none';
+  fill.style.width = pct + '%';
+}
+function setLoading(on) {
+  document.getElementById('loader').style.display = on ? 'block' : 'none';
+}
+function toggleToken() {
+  const el = document.getElementById('token');
+  const toggle = document.querySelector('.token-toggle');
+  if (el.type === 'password') {
+    el.type = 'text';
+    toggle.textContent = '🙈 Sembunyikan';
+  } else {
+    el.type = 'password';
+    toggle.textContent = '👁 Tampilkan';
   }
-  document.getElementById("loader").style.display = "block";
-  document.getElementById("status").textContent = "⏳ Mengupload ZIP...";
-  const formData = new FormData();
-  formData.append("zip", file);
-  formData.append("repo", repo);
-  try {
-    const res = await fetch(`${BACKEND_URL}/upload`, {
-      method: "POST",
-      body: formData
-    });
-    const data = await res.json();
-    if (res.ok) {
-      document.getElementById("status").textContent = data.message;
-    } else {
-      document.getElementById("status").textContent = "❌ Error: " + (data.error || "unknown");
-    }
-  } catch (e) {
-    document.getElementById("status").textContent = "❌ Gagal koneksi ke backend";
-  }
-  document.getElementById("loader").style.display = "none";
 }
 
-// Download function
-function getApk() {
-  const repo = document.getElementById("repo").value;
-  if (!repo) {
-    alert("Isi repo dulu!");
-    return;
-  }
-  window.open(`${BACKEND_URL}/latest-apk?repo=${repo}`, "_blank");
+// ── Validasi Input ─────────────────────────────────
+function getInputs() {
+  const token = document.getElementById('token').value.trim();
+  const workflowRepo = document.getElementById('workflowRepo').value.trim();
+  const file = document.getElementById('zipFile').files[0];
+  const appName = document.getElementById('appName').value.trim() || 'my-app';
+  return { token, workflowRepo, file, appName };
 }
+
+// ── Upload ZIP ke GitHub Release ───────────────────
+async function uploadToRelease(token, owner, repo, file, appName) {
+  const tag = `build-${appName}-${Date.now()}`;
+
+  // 1. Buat release
+  setStatus('📦 Membuat release di GitHub...', 'info');
+  setProgress(20);
+  const releaseRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      tag_name: tag,
+      name: `Build ${appName}`,
+      body: 'Auto-generated by APK Builder',
+      draft: false,
+      prerelease: true
+    })
+  });
+  if (!releaseRes.ok) {
+    const err = await releaseRes.json();
+    throw new Error('Gagal buat release: ' + (err.message || releaseRes.status));
+  }
+  const release = await releaseRes.json();
+
+  // 2. Upload ZIP ke release asset
+  setStatus('⬆️ Mengupload ZIP ke GitHub Release...', 'info');
+  setProgress(40);
+  const uploadUrl = release.upload_url.replace('{?name,label}', `?name=${file.name}`);
+  const arrayBuffer = await file.arrayBuffer();
+  const uploadRes = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/zip'
+    },
+    body: arrayBuffer
+  });
+  if (!uploadRes.ok) {
+    const err = await uploadRes.json();
+    throw new Error('Gagal upload ZIP: ' + (err.message || uploadRes.status));
+  }
+  const asset = await uploadRes.json();
+  return { zipUrl: asset.browser_download_url, tag };
+}
+
+// ── Trigger GitHub Actions ─────────────────────────
+async function triggerWorkflow(token, owner, repo, zipUrl, appName) {
+  setStatus('🚀 Memicu GitHub Actions...', 'info');
+  setProgress(55);
+  const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/dispatches`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      event_type: 'build-apk',
+      client_payload: { zip_url: zipUrl, app_name: appName }
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error('Gagal trigger workflow: ' + (err.message || res.status));
+  }
+}
+
+// ── Polling: Cari Run ID ───────────────────────────
+async function waitForRunId(token, owner, repo) {
+  setStatus('⏳ Menunggu GitHub Actions mulai...', 'info');
+  setProgress(65);
+  for (let i = 0; i < 20; i++) {
+    await sleep(5000);
+    const res = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/actions/runs?event=repository_dispatch&per_page=1`,
+      { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
+    );
+    const data = await res.json();
+    if (data.workflow_runs && data.workflow_runs.length > 0) {
+      return data.workflow_runs[0].id;
+    }
+  }
+  throw new Error('Timeout: GitHub Actions tidak mulai dalam 100 detik');
+}
+
+// ── Polling: Tunggu Build Selesai ──────────────────
+async function waitForBuild(token, owner, repo, rid) {
+  setStatus('🔨 Build sedang berjalan di GitHub Actions...', 'info');
+  setProgress(75);
+  for (let i = 0; i < 60; i++) {
+    await sleep(10000);
+    const res = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/actions/runs/${rid}`,
+      { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
+    );
+    const run = await res.json();
+    setStatus(`🔨 Build: ${run.status} (${run.conclusion || 'running'})... ${Math.round((i+1)*10/60)} menit`, 'info');
+    setProgress(75 + Math.min(i, 20));
+    if (run.status === 'completed') {
+      if (run.conclusion !== 'success') throw new Error('Build gagal: ' + run.conclusion);
+      return true;
+    }
+  }
+  throw new Error('Timeout: Build tidak selesai dalam 10 menit');
+}
+
+// ── Ambil URL Download Artifact ────────────────────
+async function getArtifactUrl(token, owner, repo, rid) {
+  setStatus('📥 Mengambil link APK...', 'info');
+  setProgress(97);
+  const res = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/actions/runs/${rid}/artifacts`,
+    { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' } }
+  );
+  const data = await res.json();
+  if (!data.artifacts || data.artifacts.length === 0) throw new Error('Artifact tidak ditemukan');
+  return data.artifacts[0].archive_download_url;
+}
+
+// ── Main: Start Build ──────────────────────────────
+async function startBuild() {
+  const { token, workflowRepo, file, appName } = getInputs();
+  if (!token) return setStatus('❌ Masukkan GitHub Token dulu!', 'error');
+  if (!workflowRepo || !workflowRepo.includes('/')) return setStatus('❌ Format repo harus username/repo', 'error');
+  if (!file) return setStatus('❌ Pilih file ZIP dulu!', 'error');
+
+  const [owner, repo] = workflowRepo.split('/');
+
+  document.getElementById('btnBuild').disabled = true;
+  document.getElementById('btnDownload').disabled = true;
+  setLoading(true);
+  setProgress(10);
+  runId = null;
+  artifactUrl = null;
+
+  try {
+    // 1. Upload ZIP ke GitHub Release
+    const { zipUrl } = await uploadToRelease(token, owner, repo, file, appName);
+
+    // 2. Trigger workflow
+    await triggerWorkflow(token, owner, repo, zipUrl, appName);
+
+    // 3. Tunggu run ID muncul
+    runId = await waitForRunId(token, owner, repo);
+
+    // 4. Tunggu build selesai
+    await waitForBuild(token, owner, repo, runId);
+
+    // 5. Ambil artifact
+    artifactUrl = await getArtifactUrl(token, owner, repo, runId);
+
+    setProgress(100);
+    setStatus('✅ Build selesai! Klik Download APK untuk mengunduh.', 'success');
+    document.getElementById('btnDownload').disabled = false;
+  } catch (e) {
+    setStatus('❌ ' + e.message, 'error');
+    setProgress(0);
+  } finally {
+    setLoading(false);
+    document.getElementById('btnBuild').disabled = false;
+  }
+}
+
+// ── Download APK ───────────────────────────────────
+function downloadApk() {
+  if (!artifactUrl) return setStatus('❌ Belum ada APK. Jalankan build dulu!', 'error');
+  const token = document.getElementById('token').value.trim();
+  // Artifact GitHub butuh auth, buka di tab baru dengan token via fetch
+  setStatus('⬇️ Mendownload APK... (cek folder Downloads)', 'info');
+  fetch(artifactUrl, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Gagal download: ' + res.status);
+    return res.blob();
+  })
+  .then(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'app-debug.zip';
+    a.click();
+    URL.revokeObjectURL(url);
+    setStatus('✅ APK berhasil didownload!', 'success');
+  })
+  .catch(e => setStatus('❌ ' + e.message, 'error'));
+}
+
+// ── Helper ─────────────────────────────────────────
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>

@@ -21,14 +21,5 @@
       "purpose": "any maskable"
     }
   ],
-  "shortcuts": [
-    {
-      "name": "Upload Project",
-      "short_name": "Upload",
-      "description": "Upload ZIP baru untuk dibangun",
-      "url": "/",
-      "icons": [{ "src": "icon/icon-192.png", "sizes": "192x192" }]
-    }
-  ],
   "categories": ["development", "utilities"]
 }
