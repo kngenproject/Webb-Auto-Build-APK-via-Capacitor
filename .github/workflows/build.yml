@@ -78,27 +78,33 @@ jobs:
         chmod +x gradlew
         ./gradlew assembleDebug
 
-    - name: Upload ke file.io
+    - name: Upload ke GoFile
       id: transfer
       run: |
         APK_PATH=$(find android/app/build/outputs/apk/debug/ -name "*.apk" | head -1)
         APK_NAME="${{ env.APP_NAME }}-${{ github.run_id }}.apk"
-        echo "📤 Mengupload APK ke file.io..."
-        RESPONSE=$(curl -s --max-time 120 -F "file=@${APK_PATH};filename=${APK_NAME}" "https://file.io/?expires=14d")
+        echo "📤 Mengupload APK ke GoFile..."
+
+        # 1. Dapatkan server upload terbaik
+        SERVER=$(curl -s "https://api.gofile.io/servers" | grep -o '"name":"[^"]*"' | head -1 | sed 's/"name":"//;s/"//')
+        echo "Server: $SERVER"
+
+        # 2. Upload APK
+        RESPONSE=$(curl -s --max-time 180 -F "file=@${APK_PATH};filename=${APK_NAME}" "https://${SERVER}.gofile.io/contents/uploadfile")
         echo "Response: $RESPONSE"
-        # Cek sukses
-        SUCCESS=$(echo "$RESPONSE" | grep -o '"success":true' || true)
-        if [ -z "$SUCCESS" ]; then
-          echo "❌ Upload gagal. Response: $RESPONSE"
+
+        # 3. Ambil link download
+        DOWNLOAD_URL=$(echo "$RESPONSE" | grep -o '"downloadPage":"[^"]*"' | sed 's/"downloadPage":"//;s/"//')
+        if [ -z "$DOWNLOAD_URL" ]; then
+          echo "❌ Upload gagal"
           exit 1
         fi
-        # Ambil link dengan grep+sed (tidak pakai python)
-        DOWNLOAD_URL=$(echo "$RESPONSE" | grep -o '"link":"[^"]*"' | sed 's/"link":"//;s/"//')
+
         echo "download_url=${DOWNLOAD_URL}" >> $GITHUB_OUTPUT
         echo "=========================================="
         echo "✅ APK SIAP DIDOWNLOAD!"
         echo "🔗 Link: ${DOWNLOAD_URL}"
-        echo "⏳ Link berlaku 14 hari (1x download)"
+        echo "⏳ Link tidak expired selama ada aktivitas"
         echo "=========================================="
 
     - name: Simpan link ke apk-result.json
