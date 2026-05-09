@@ -145,6 +145,39 @@ button:active { transform: scale(0.98); }
   color: #475569;
   margin-top: 20px;
 }
+
+.save-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.btn-save {
+  flex: 1;
+  background: #0ea5e9;
+  color: white;
+  margin-top: 0;
+}
+.btn-save:hover { background: #0284c7; }
+.btn-save.saved { background: #166534; color: #4ade80; }
+.btn-clear {
+  width: auto;
+  padding: 13px 16px;
+  margin-top: 0;
+  background: #1e293b;
+  color: #94a3b8;
+  font-size: 13px;
+}
+.btn-clear:hover { background: #334155; }
+.save-badge {
+  float: right;
+  font-size: 10px;
+  color: #4ade80;
+  background: #14532d;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-weight: normal;
+}
+
 .token-toggle {
   font-size: 11px;
   color: #3b82f6;
@@ -165,13 +198,22 @@ button:active { transform: scale(0.98); }
       <label>
         GitHub Token
         <span class="token-toggle" onclick="toggleToken()">👁 Tampilkan</span>
+        <span class="save-badge" id="tokenSaved" style="display:none">✓ Tersimpan</span>
       </label>
-      <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxx">
+      <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxx" oninput="markUnsaved()">
     </div>
 
     <div class="field">
-      <label>Owner/Repo Workflow (tempat build.yml)</label>
-      <input type="text" id="workflowRepo" placeholder="username/apk-builder-workflow">
+      <label>
+        Owner/Repo Workflow (tempat build.yml)
+        <span class="save-badge" id="repoSaved" style="display:none">✓ Tersimpan</span>
+      </label>
+      <input type="text" id="workflowRepo" placeholder="username/apk-builder-workflow" oninput="markUnsaved()">
+    </div>
+
+    <div class="save-row">
+      <button class="btn-save" id="btnSave" onclick="saveSettings()">💾 Simpan Pengaturan</button>
+      <button class="btn-clear" onclick="clearSettings()">🗑 Hapus</button>
     </div>
 
     <hr class="divider">
@@ -234,6 +276,7 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   });
+  loadSettings();
 }
 
 // ── UI Helpers ─────────────────────────────────────
@@ -261,6 +304,54 @@ function toggleToken() {
     el.type = 'password';
     toggle.textContent = '👁 Tampilkan';
   }
+}
+
+
+// ── Simpan Pengaturan ──────────────────────────────
+function saveSettings() {
+  const token = document.getElementById('token').value.trim();
+  const repo = document.getElementById('workflowRepo').value.trim();
+  if (!token && !repo) return setStatus('❌ Token dan repo kosong, tidak ada yang disimpan.', 'error');
+  if (token) localStorage.setItem('apk_token', token);
+  if (repo) localStorage.setItem('apk_repo', repo);
+  showSavedBadges();
+  const btn = document.getElementById('btnSave');
+  btn.textContent = '✅ Tersimpan!';
+  btn.classList.add('saved');
+  setTimeout(() => {
+    btn.textContent = '💾 Simpan Pengaturan';
+    btn.classList.remove('saved');
+  }, 2000);
+}
+
+function clearSettings() {
+  localStorage.removeItem('apk_token');
+  localStorage.removeItem('apk_repo');
+  document.getElementById('token').value = '';
+  document.getElementById('workflowRepo').value = '';
+  document.getElementById('tokenSaved').style.display = 'none';
+  document.getElementById('repoSaved').style.display = 'none';
+  setStatus('🗑 Pengaturan dihapus.', 'info');
+}
+
+function loadSettings() {
+  const token = localStorage.getItem('apk_token');
+  const repo = localStorage.getItem('apk_repo');
+  if (token) document.getElementById('token').value = token;
+  if (repo) document.getElementById('workflowRepo').value = repo;
+  if (token || repo) showSavedBadges();
+}
+
+function showSavedBadges() {
+  if (localStorage.getItem('apk_token'))
+    document.getElementById('tokenSaved').style.display = 'inline';
+  if (localStorage.getItem('apk_repo'))
+    document.getElementById('repoSaved').style.display = 'inline';
+}
+
+function markUnsaved() {
+  document.getElementById('tokenSaved').style.display = 'none';
+  document.getElementById('repoSaved').style.display = 'none';
 }
 
 // ── Validasi Input ─────────────────────────────────
