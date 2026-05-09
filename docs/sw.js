@@ -1,10 +1,16 @@
 const CACHE_NAME = 'apk-builder-v2';
-const urlsToCache = ['/', '/index.html', '/manifest.json'];
+const urlsToCache = [
+  './index.html',
+  './manifest.json',
+  './icon/icon-192.png',
+  './icon/icon-512.png'
+];
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
+  self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {
@@ -29,4 +35,5 @@ self.addEventListener('activate', event => {
       )
     )
   );
+  self.clients.claim();
 });
